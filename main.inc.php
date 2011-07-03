@@ -3,7 +3,7 @@
 Plugin Name: Icy Modify Picture
 Version: 1.0.0
 Description: Allow users to modify users they uploaded
-Plugin URI: https://github.com/icy/icy_picture_modify
+Plugin URI: http://piwigo.org/ext/extension_view.php?eid=563
 Author: icy
 Author URI: http://metakyanh.sarovar.org/
 */
@@ -17,7 +17,14 @@ if (!defined('PHPWG_ROOT_PATH'))
 define('ICY_PICTURE_MODIFY_PATH' , PHPWG_PLUGINS_PATH.basename(dirname(__FILE__)).'/');
 include_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
 
+# Hooks declaration
+
 add_event_handler('loc_end_section_init', 'icy_picture_modify_section_init');
+add_event_handler('loc_end_index', 'icy_picture_modify_index');
+add_event_handler('loc_begin_picture', 'icy_picture_modify_loc_begin_picture');
+
+# Hooks definitions
+
 function icy_picture_modify_section_init()
 {
   global $tokens, $page;
@@ -28,7 +35,6 @@ function icy_picture_modify_section_init()
   }
 }
 
-add_event_handler('loc_end_index', 'icy_picture_modify_index');
 function icy_picture_modify_index()
 {
   global $page;
@@ -40,7 +46,7 @@ function icy_picture_modify_index()
 }
 
 // provide the link to modify the picture
-add_event_handler('loc_begin_picture', 'icy_picture_modify_loc_begin_picture');
+// FIXME: Why use $page['image_id'] instead of $_GET['image_id']
 function icy_picture_modify_loc_begin_picture()
 {
   global $conf, $template, $page, $user;
