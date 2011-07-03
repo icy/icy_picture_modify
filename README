@@ -1,0 +1,40 @@
+Name
+  Icy Picture Modify
+
+Description
+  A piwigo extension that allows users to modify pictures they uploaded.
+  This extension just works as the 'picture_modify.php' for administrator.
+
+Author
+  icy
+
+License
+  GPL2
+
+Homepage
+  https://github.com/icy/icy_picture_modify
+
+Usage
+
+  1. Install and enable the plugin "community" which allows users to upload pictures
+  2. Install and enable this extension
+  3. When users view a picture they uploaded, they will be provided a link
+     to modify that picture's information.
+
+Features
+
+  The users can modify the following information of the picture
+    1. Author
+    2. Description
+    3. Picture's date
+    4. Tags
+    5. ACL
+    6. Synchornize meta data
+    7. Delete picture
+
+Known problems
+
+  1. Doesn't support all known templates
+  2. The source code isn't cleaned up for some hidden features:
+      - Link picture to some albums
+      - Use picture as some albums' thumbnail
