@@ -3,7 +3,7 @@
 Plugin Name: Icy User Modify Picture
 Version: 1.0.0
 Description: Allow users to modify users they uploaded
-Plugin URI: https://github.com/icyfork/piwigo
+Plugin URI: https://github.com/icy/icy_picture_modify
 Author: icy
 Author URI: http://metakyanh.sarovar.org/
 */
