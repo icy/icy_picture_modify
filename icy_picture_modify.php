@@ -29,7 +29,7 @@ include_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.p
 
 global $template, $conf, $user, $page, $lang, $cache;
 
-// redirect users to the index page if 'image_id' isn't provided
+// redirect users to the index page or category page if 'image_id' isn't provided
 if (!isset($_GET['image_id']))
 {
   if (isset($_GET['cat_id']))
