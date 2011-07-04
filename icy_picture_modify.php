@@ -48,7 +48,7 @@ if (!isset($_GET['image_id']))
   }
   else
   {
-    $_SESSION['page_infos'] = array(l10n('Permission denied'));
+   // FIXME: $_SESSION['page_infos'] = array(l10n('Permission denied'));
     redirect_http(make_index_url());
   }
 }
