@@ -29,6 +29,16 @@ include_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.p
 
 global $template, $conf, $user, $page, $lang, $cache;
 
+// <admin.php>
+$page['errors'] = array();
+$page['infos']  = array();
+$page['warnings']  = array();
+// </admin.php>
+
+// +-----------------------------------------------------------------------+
+// |                             check permission                          |
+// +-----------------------------------------------------------------------+
+
 // redirect users to the index page or category page if 'image_id' isn't provided
 if (!isset($_GET['image_id']))
 {
@@ -38,6 +48,7 @@ if (!isset($_GET['image_id']))
   }
   else
   {
+    $_SESSION['page_infos'] = array(l10n('Permission denied'));
     redirect_http(make_index_url());
   }
 }
@@ -45,29 +56,32 @@ if (!isset($_GET['image_id']))
 check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
-// make sure the image is editable by current user
-if (!icy_check_image_owner($_GET['image_id'], $user['id']))
+// Simplify redirect to administrator page if current user == admin
+if (is_admin())
+{
+  $url = get_root_url().'admin.php?page=picture_modify';
+  $url.= '&amp;image_id='.$_GET['image_id'];
+  $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
+  redirect_http($url);
+}
+elseif (!icy_check_image_owner($_GET['image_id'], $user['id']))
 {
   $url = make_picture_url(
       array(
         'image_id' => $_GET['image_id'],
-        'cat_id' => $_GET['cat_id'],
+        'cat_id' => isset($_GET['cat_id']) ? $_GET['cat_id'] : ""
       )
     );
   redirect_http($url);
 }
 
-// <admin.php>
-$page['errors'] = array();
-$page['infos']  = array();
-$page['warnings']  = array();
-
+// Update the page sessions
 if (isset($_SESSION['page_infos']))
 {
   $page['infos'] = array_merge($page['infos'], $_SESSION['page_infos']);
   unset($_SESSION['page_infos']);
 }
-// </admin.php>
+
 
 // +-----------------------------------------------------------------------+
 // |                             delete photo                              |
