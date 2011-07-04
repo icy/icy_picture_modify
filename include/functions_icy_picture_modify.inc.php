@@ -32,11 +32,11 @@ function icy_check_image_owner($image_id, $user_id = 0)
 {
   if (!preg_match(PATTERN_ID, $image_id))
   {
-    fatal_error('[Hacking attempt] the input parameter "'.$image_id.'" is not valid');
+    bad_request('invalid picture identifier');
   }
   if (!preg_match(PATTERN_ID, $user_id))
   {
-    fatal_error('[Hacking attempt] the input parameter "'.$user_id.'" is not valid');
+    bad_request('invalid category identifier');
   }
 
   $query = '

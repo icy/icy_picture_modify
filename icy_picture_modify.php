@@ -48,7 +48,7 @@ if (!isset($_GET['image_id']))
   }
   else
   {
-   // FIXME: $_SESSION['page_infos'] = array(l10n('Permission denied'));
+    // FIXME: $_SESSION['page_infos'] = array(l10n('Permission denied'));
     redirect_http(make_index_url());
   }
 }
@@ -57,6 +57,9 @@ check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
 // Simplify redirect to administrator page if current user == admin
+// FIXME: when a non-existent image_id is provided, the original code
+// FIXME: picture_modify doesn't work well. It should deny to modify
+// FIXME: such picture.
 if (is_admin())
 {
   $url = get_root_url().'admin.php?page=picture_modify';
@@ -72,6 +75,7 @@ elseif (!icy_check_image_owner($_GET['image_id'], $user['id']))
         'cat_id' => isset($_GET['cat_id']) ? $_GET['cat_id'] : ""
       )
     );
+  // FIXME: $_SESSION['page_infos'] = array(l10n('Permission denied'));
   redirect_http($url);
 }
 
