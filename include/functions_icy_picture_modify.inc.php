@@ -32,11 +32,11 @@ function icy_check_image_owner($image_id, $user_id = 0)
 {
   if (!preg_match(PATTERN_ID, $image_id))
   {
-    fatal_error('[Hacking attempt] the input parameter "'.$image_id.'" is not valid');
+    bad_request('invalid picture identifier');
   }
   if (!preg_match(PATTERN_ID, $user_id))
   {
-    fatal_error('[Hacking attempt] the input parameter "'.$user_id.'" is not valid');
+    bad_request('invalid category identifier');
   }
 
   $query = '
@@ -48,6 +48,27 @@ SELECT COUNT(id)
 
   list($count) = pwg_db_fetch_row(pwg_query($query));
 
+  return ($count > 0 ? true: false);
+}
+
+/*
+ * Check if an image does exist
+ * @return bool
+ * @author icy
+ *
+*/
+function icy_does_image_exist($image_id)
+{
+  if (!preg_match(PATTERN_ID, $image_id))
+  {
+    bad_request('invalid picture identifier');
+  }
+  $query = '
+SELECT COUNT(id)
+  FROM '.IMAGES_TABLE.'
+  WHERE id = '.$image_id.'
+;';
+  list($count) = pwg_db_fetch_row(pwg_query($query));
   return ($count > 0 ? true: false);
 }
 ?>

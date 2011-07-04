@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: Icy Modify Picture
-Version: 1.0.1
-Description: Allow users to modify users they uploaded
+Version: 1.0.2
+Description: Allow users to modify pictures they uploaded
 Plugin URI: http://piwigo.org/ext/extension_view.php?eid=563
 Author: icy
 Author URI: http://metakyanh.sarovar.org/
