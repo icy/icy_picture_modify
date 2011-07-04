@@ -1,0 +1,22 @@
+1.0.2 2011-07-04
+
+  - Compatible with Piwigo 2.2.3
+  - Redirect user to the original page 'picture_modify.php' if the
+    current user is an administrator
+  - Check if an image does exist before invoking other codes
+    (the original code 'picture_modify' doesn't check that.)
+  - Fix display name of the plugin in the Piwigo's panel
+  - Doesn't show the internal data if image_id is invalid
+    (use bad_request instead of fatal_error)
+
+1.0.1 2011-07-04
+
+  - Compatible with Piwigo 2.2.3
+  - Fix Plugin URI (to support AutoUpdate)
+  - Update the file README
+  - Clean up code
+
+1.0.0 2011-07-03
+
+  - Compatible with Piwigo 2.2.3
+  - Initial version
