@@ -62,10 +62,17 @@ check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 // FIXME: such picture.
 if (is_admin())
 {
-  $url = get_root_url().'admin.php?page=picture_modify';
-  $url.= '&amp;image_id='.$_GET['image_id'];
-  $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
-  redirect_http($url);
+  if (icy_does_image_exist($_GET['image_id']))
+  {
+    $url = get_root_url().'admin.php?page=picture_modify';
+    $url.= '&amp;image_id='.$_GET['image_id'];
+    $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
+    redirect_http($url);
+  }
+  else
+  {
+    bad_request('invalid picture identifier');
+  }
 }
 elseif (!icy_check_image_owner($_GET['image_id'], $user['id']))
 {

@@ -50,4 +50,25 @@ SELECT COUNT(id)
 
   return ($count > 0 ? true: false);
 }
+
+/*
+ * Check if an image does exist
+ * @return bool
+ * @author icy
+ *
+*/
+function icy_does_image_exist($image_id)
+{
+  if (!preg_match(PATTERN_ID, $image_id))
+  {
+    bad_request('invalid picture identifier');
+  }
+  $query = '
+SELECT COUNT(id)
+  FROM '.IMAGES_TABLE.'
+  WHERE id = '.$image_id.'
+;';
+  list($count) = pwg_db_fetch_row(pwg_query($query));
+  return ($count > 0 ? true: false);
+}
 ?>
