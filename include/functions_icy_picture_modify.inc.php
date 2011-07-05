@@ -61,7 +61,7 @@ function icy_does_image_exist($image_id)
 {
   if (!preg_match(PATTERN_ID, $image_id))
   {
-    bad_request('invalid picture identifier');
+    return false;
   }
   $query = '
 SELECT COUNT(id)
