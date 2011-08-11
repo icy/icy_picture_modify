@@ -182,3 +182,57 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
   </fieldset>
 
 </form>
+
+<form id="associations" method="post" action="{$F_ACTION}#associations">
+  <fieldset>
+    <legend>{'Linked albums'|@translate}</legend>
+
+    <table class="doubleSelect">
+      <tr>
+        <td>
+          <h3>{'Associated'|@translate}</h3>
+          <select class="categoryList" name="cat_associated[]" multiple="multiple" size="30">
+            {html_options options=$associated_options}
+          </select>
+          <p><input class="submit" type="submit" value="&raquo;" name="dissociate" style="font-size:15px;"></p>
+        </td>
+
+        <td>
+          <h3>{'Dissociated'|@translate}</h3>
+          <select class="categoryList" name="cat_dissociated[]" multiple="multiple" size="30">
+            {html_options options=$dissociated_options}
+          </select>
+          <p><input class="submit" type="submit" value="&laquo;" name="associate" style="font-size:15px;"></p>
+        </td>
+      </tr>
+    </table>
+
+  </fieldset>
+</form>
+
+<form id="representation" method="post" action="{$F_ACTION}#representation">
+  <fieldset>
+    <legend>{'Representation of albums'|@translate}</legend>
+
+    <table class="doubleSelect">
+      <tr>
+        <td>
+          <h3>{'Represents'|@translate}</h3>
+          <select class="categoryList" name="cat_elected[]" multiple="multiple" size="30">
+            {html_options options=$elected_options}
+          </select>
+          <p><input class="submit" type="submit" value="&raquo;" name="dismiss" style="font-size:15px;"></p>
+        </td>
+
+        <td>
+          <h3>{'Does not represent'|@translate}</h3>
+          <select class="categoryList" name="cat_dismissed[]" multiple="multiple" size="30">
+            {html_options options=$dismissed_options}
+          </select>
+          <p><input class="submit" type="submit" value="&laquo;" name="elect" style="font-size:15px;"></p>
+        </td>
+      </tr>
+    </table>
+
+  </fieldset>
+</form>

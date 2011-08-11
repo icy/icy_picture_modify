@@ -57,9 +57,6 @@ check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
 // Simplify redirect to administrator page if current user == admin
-// FIXME: when a non-existent image_id is provided, the original code
-// FIXME: picture_modify doesn't work well. It should deny to modify
-// FIXME: such picture.
 if (is_admin())
 {
   if (icy_does_image_exist($_GET['image_id']))
@@ -67,6 +64,7 @@ if (is_admin())
     $url = get_root_url().'admin.php?page=picture_modify';
     $url.= '&amp;image_id='.$_GET['image_id'];
     $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
+    // FIXME: What happens if a POST data were sent within admin uid?
     redirect_http($url);
   }
   else
@@ -230,6 +228,25 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
 
   array_push($page['infos'], l10n('Photo informations updated'));
 }
+
+// <find>
+// find all linked categories that are reachable for the current user.
+$query = '
+SELECT category_id
+  FROM '.IMAGE_CATEGORY_TABLE.'
+  WHERE image_id = '.$_GET['image_id'].'
+;';
+
+// list of categories to which the user can access
+$authorizeds = array_diff(
+  array_from_query($query, 'category_id'),
+  explode(
+    ',',
+    calculate_permissions($user['id'], $user['status'])
+    )
+  );
+// </find>
+
 // associate the element to other categories than its storage category
 if (isset($_POST['associate'])
     and isset($_POST['cat_dissociated'])
@@ -238,7 +255,7 @@ if (isset($_POST['associate'])
 {
   associate_images_to_categories(
     array($_GET['image_id']),
-    $_POST['cat_dissociated']
+    array_intersect($_POST['cat_dissociated'], $authorizeds)
     );
 }
 // dissociate the element from categories (but not from its storage category)
@@ -247,31 +264,36 @@ if (isset($_POST['dissociate'])
     and count($_POST['cat_associated']) > 0
   )
 {
+  $arr_dissociate = array_intersect($_POST['cat_associated'], $authorizeds);
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   WHERE image_id = '.$_GET['image_id'].'
-    AND category_id IN ('.implode(',', $_POST['cat_associated']).')
+    AND category_id IN ('.implode(',', $arr_dissociate).')
 ';
   pwg_query($query);
 
-  update_category($_POST['cat_associated']);
+  update_category($arr_dissociate);
 }
-// elect the element to represent the given categories
+// select the element to represent the given categories
 if (isset($_POST['elect'])
     and isset($_POST['cat_dismissed'])
     and count($_POST['cat_dismissed']) > 0
   )
 {
   $datas = array();
-  foreach ($_POST['cat_dismissed'] as $category_id)
+  $arr_dimissed = array_intersect($_POST['cat_dismissed'], $authorizeds);
+  if (count($arr_dimissed) > 0)
   {
-    array_push($datas,
-               array('id' => $category_id,
-                     'representative_picture_id' => $_GET['image_id']));
+    foreach ($arr_dimissed as $category_id)
+    {
+      array_push($datas,
+                 array('id' => $category_id,
+                       'representative_picture_id' => $_GET['image_id']));
+    }
+    $fields = array('primary' => array('id'),
+                    'update' => array('representative_picture_id'));
+    mass_updates(CATEGORIES_TABLE, $fields, $datas);
   }
-  $fields = array('primary' => array('id'),
-                  'update' => array('representative_picture_id'));
-  mass_updates(CATEGORIES_TABLE, $fields, $datas);
 }
 // dismiss the element as representant of the given categories
 if (isset($_POST['dismiss'])
@@ -279,7 +301,11 @@ if (isset($_POST['dismiss'])
     and count($_POST['cat_elected']) > 0
   )
 {
-  set_random_representant($_POST['cat_elected']);
+  $arr_dismiss = array_intersect($_POST['cat_elected'], $authorizeds);
+  if (count($arr_dismiss) > 0)
+  {
+    set_random_representant($arr_dismiss);
+  }
 }
 
 // tags
@@ -309,6 +335,7 @@ SELECT *
 ;';
 $row = pwg_db_fetch_assoc(pwg_query($query));
 
+// the physical storage directory contains the image
 $storage_category_id = null;
 if (!empty($row['storage_category_id']))
 {
@@ -462,6 +489,7 @@ SELECT category_id
   WHERE image_id = '.$_GET['image_id'].'
 ;';
 
+// list of categories to which the user can access
 $authorizeds = array_diff(
   array_from_query($query, 'category_id'),
   explode(
@@ -470,6 +498,8 @@ $authorizeds = array_diff(
     )
   );
 
+// if current category belongs to list of authorized categories
+// we simply provide link to that category
 if (isset($_GET['cat_id'])
     and in_array($_GET['cat_id'], $authorizeds))
 {
@@ -481,6 +511,7 @@ if (isset($_GET['cat_id'])
       )
     );
 }
+// otherwise we provide links to the first category in the list
 else
 {
   foreach ($authorizeds as $category)
@@ -492,6 +523,7 @@ else
         'category' => $cache['cat_names'][ $category ],
         )
       );
+    // FIXME: why the first category is selected?
     break;
   }
 }
@@ -506,7 +538,10 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
     INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
-  WHERE image_id = '.$_GET['image_id'];
+  WHERE image_id = '.$_GET['image_id'] . '
+    AND id IN ('. join(",", $authorizeds).')';
+// if the image belongs to a physical storage,
+// we simply ignore that storage album
 if (isset($storage_category_id))
 {
   $query.= '
@@ -530,6 +565,7 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE id NOT IN ('.implode(',', $associateds).')
+  AND id IN ('. join(",", $authorizeds).')
 ;';
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 
@@ -538,14 +574,16 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE representative_picture_id = '.$_GET['image_id'].'
+    AND category_id IN ('. join(",", $authorizeds).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
 
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
-  WHERE representative_picture_id != '.$_GET['image_id'].'
-    OR representative_picture_id IS NULL
+  WHERE id IN ('. join(",", $authorizeds).')
+    AND (representative_picture_id != '.$_GET['image_id'].'
+    OR representative_picture_id IS NULL)
 ;';
 display_select_cat_wrapper($query, array(), 'dismissed_options');
 
