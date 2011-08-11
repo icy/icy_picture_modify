@@ -260,7 +260,7 @@ if (isset($_POST['dissociate'])
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   WHERE image_id = '.$_GET['image_id'].'
-    AND id IN ('.implode(',', $arr_dissociate).')
+    AND category_id IN ('.implode(',', $arr_dissociate).')
 ';
   pwg_query($query);
 
