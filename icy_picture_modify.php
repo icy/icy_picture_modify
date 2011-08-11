@@ -101,7 +101,7 @@ SELECT category_id
 // list of categories to which the user can access
 $my_categories = array_diff(
   array_from_query($query, 'category_id'),
-  explode(',',calculate_permissions($user['id'], $user['status']))));
+  explode(',',calculate_permissions($user['id'], $user['status'])));
 // </find>
 
 // +-----------------------------------------------------------------------+
