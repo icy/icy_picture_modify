@@ -91,6 +91,18 @@ if (isset($_SESSION['page_infos']))
   unset($_SESSION['page_infos']);
 }
 
+// <find>
+// find all categories that are reachable for the current user.
+$query = '
+SELECT category_id
+  FROM '.IMAGE_CATEGORY_TABLE.'
+;';
+
+// list of categories to which the user can access
+$my_categories = array_diff(
+  array_from_query($query, 'category_id'),
+  explode(',',calculate_permissions($user['id'], $user['status']))));
+// </find>
 
 // +-----------------------------------------------------------------------+
 // |                             delete photo                              |
@@ -125,10 +137,8 @@ SELECT category_id
   WHERE image_id = '.$_GET['image_id'].'
 ;';
 
-  $authorizeds = array_diff(
-    array_from_query($query, 'category_id'),
-    explode(',', calculate_permissions($user['id'], $user['status']))
-    );
+  $authorizeds = array_intersect($my_categories,
+    array_from_query($query, 'category_id'));
 
   foreach ($authorizeds as $category_id)
   {
@@ -229,24 +239,6 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
   array_push($page['infos'], l10n('Photo informations updated'));
 }
 
-// <find>
-// find all linked categories that are reachable for the current user.
-$query = '
-SELECT category_id
-  FROM '.IMAGE_CATEGORY_TABLE.'
-  WHERE image_id = '.$_GET['image_id'].'
-;';
-
-// list of categories to which the user can access
-$authorizeds = array_diff(
-  array_from_query($query, 'category_id'),
-  explode(
-    ',',
-    calculate_permissions($user['id'], $user['status'])
-    )
-  );
-// </find>
-
 // associate the element to other categories than its storage category
 if (isset($_POST['associate'])
     and isset($_POST['cat_dissociated'])
@@ -255,7 +247,7 @@ if (isset($_POST['associate'])
 {
   associate_images_to_categories(
     array($_GET['image_id']),
-    array_intersect($_POST['cat_dissociated'], $authorizeds)
+    array_intersect($_POST['cat_dissociated'], $my_categories)
     );
 }
 // dissociate the element from categories (but not from its storage category)
@@ -264,7 +256,7 @@ if (isset($_POST['dissociate'])
     and count($_POST['cat_associated']) > 0
   )
 {
-  $arr_dissociate = array_intersect($_POST['cat_associated'], $authorizeds);
+  $arr_dissociate = array_intersect($_POST['cat_associated'], $my_categories);
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   WHERE image_id = '.$_GET['image_id'].'
@@ -281,7 +273,7 @@ if (isset($_POST['elect'])
   )
 {
   $datas = array();
-  $arr_dimissed = array_intersect($_POST['cat_dismissed'], $authorizeds);
+  $arr_dimissed = array_intersect($_POST['cat_dismissed'], $my_categories);
   if (count($arr_dimissed) > 0)
   {
     foreach ($arr_dimissed as $category_id)
@@ -301,7 +293,7 @@ if (isset($_POST['dismiss'])
     and count($_POST['cat_elected']) > 0
   )
 {
-  $arr_dismiss = array_intersect($_POST['cat_elected'], $authorizeds);
+  $arr_dismiss = array_intersect($_POST['cat_elected'], $my_categories);
   if (count($arr_dismiss) > 0)
   {
     set_random_representant($arr_dismiss);
@@ -489,14 +481,9 @@ SELECT category_id
   WHERE image_id = '.$_GET['image_id'].'
 ;';
 
-// list of categories to which the user can access
-$authorizeds = array_diff(
-  array_from_query($query, 'category_id'),
-  explode(
-    ',',
-    calculate_permissions($user['id'], $user['status'])
-    )
-  );
+// list of categories (OF THIS IMAGE) to which the user can access
+$authorizeds = array_intersect($my_categories,
+  array_from_query($query, 'category_id'));
 
 // if current category belongs to list of authorized categories
 // we simply provide link to that category
@@ -511,7 +498,7 @@ if (isset($_GET['cat_id'])
       )
     );
 }
-// otherwise we provide links to the first category in the list
+// otherwise we provide links to the *first* category in the list
 else
 {
   foreach ($authorizeds as $category)
@@ -539,7 +526,7 @@ SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
     INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
   WHERE image_id = '.$_GET['image_id'] . '
-    AND id IN ('. join(",", $authorizeds).')';
+    AND id IN ('. join(",", $my_categories).')';
 // if the image belongs to a physical storage,
 // we simply ignore that storage album
 if (isset($storage_category_id))
@@ -565,7 +552,7 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE id NOT IN ('.implode(',', $associateds).')
-  AND id IN ('. join(",", $authorizeds).')
+  AND id IN ('. join(",", $my_categories).')
 ;';
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 
@@ -574,14 +561,14 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE representative_picture_id = '.$_GET['image_id'].'
-    AND id IN ('. join(",", $authorizeds).')
+    AND id IN ('. join(",", $my_categories).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
 
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
-  WHERE id IN ('. join(",", $authorizeds).')
+  WHERE id IN ('. join(",", $my_categories).')
     AND (representative_picture_id != '.$_GET['image_id'].'
     OR representative_picture_id IS NULL)
 ;';
