@@ -268,7 +268,7 @@ if (isset($_POST['dissociate'])
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   WHERE image_id = '.$_GET['image_id'].'
-    AND category_id IN ('.implode(',', $arr_dissociate).')
+    AND id IN ('.implode(',', $arr_dissociate).')
 ';
   pwg_query($query);
 
@@ -574,7 +574,7 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE representative_picture_id = '.$_GET['image_id'].'
-    AND category_id IN ('. join(",", $authorizeds).')
+    AND id IN ('. join(",", $authorizeds).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
 
