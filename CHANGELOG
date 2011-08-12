@@ -1,3 +1,16 @@
+1.0.3 2011-08-12
+
+  - Compatible with Piwigo 2.2.3, Piwigo 2.2.4 and the lastest version
+    of the plugin 'community' (*)
+  - Allow user to make links for image (image may be associated to or
+    dissociate from any uploadable album). See KNOWN PROBLEMS in the file
+    README for more details.
+  - Allow user to make represent for uploadable albums. See KNOWN PROBLEMS
+    in the file README for more details.
+  - Clean up code
+
+  (*) http://piwigo.org/ext/extension_view.php?eid=303
+
 1.0.2 2011-07-04
 
   - Compatible with Piwigo 2.2.3
