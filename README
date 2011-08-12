@@ -1,45 +1,54 @@
-Name
-  Icy Picture Modify
+NAME
 
-Description
+  icy_picture_modify -- Allow user to modify their pictures
+
+DESCRIPTION
+
   A piwigo extension that allows users to modify pictures they uploaded.
   This extension just works as the 'picture_modify.php' for administrator.
 
   The code of this plugin is heavily based on the original source
   'picture_modify.php' of the Piwigo distribution (version 2.2.3.)
 
-Author
-  icy
-
-License
-  GPL2
-
-Homepage
-  At Github.com:  https://github.com/icy/icy_picture_modify
-  At Piwigo.com:  http://piwigo.org/ext/extension_view.php?eid=563
-  SVN repository: http://piwigo.org/svn/extensions/Icy_Picture_Modify/
-
-Usage
+USAGE
 
   1. Install and enable the plugin "community" which allows users to upload pictures
   2. Install and enable this extension
   3. When users view a picture they uploaded, they will be provided a link
      to modify that picture's information.
 
-Features
+FEATURES
 
   Users can modify the following information of a picture
-    1. Author
-    2. Description
-    3. Picture's date
-    4. Tags
-    5. ACL
-    6. Synchronize meta data
-    7. Delete picture
+    * Author
+    * Description
+    * Picture's date
+    * Tags
+    * ACL
+    * Synchronize meta data
+    * Delete picture
+    * Associcate/Dissociated image to/from uploadable category
+    * Use image to represent for uploadable category
 
-Known problems
+KNOWN PROBLEMS
 
-  1. Doesn't support all known templates
-  2. The source code isn't cleaned up for some hidden features:
-      - Link picture to some albums
-      - Use picture as some albums' thumbnail
+  * This plugin doesn't support all known templates
+  * This plugin may not work smoothly without plugin 'community'
+  * User can delete an image which is associated to some albums to which
+    the user doesn't have permission to write/access. When the plugin
+    'community' isn't installed, user can create image's link and/or
+    represents for any visible albums in the gallery.
+
+AUTHOR
+
+  Anh K. Huỳnh (icy)
+
+LICENSE
+
+  GPL2
+
+HOMGEPAGE
+
+  At Github.com:  https://github.com/icy/icy_picture_modify
+  At Piwigo.com:   http://piwigo.org/ext/extension_view.php?eid=563
+  SVN repository:  http://piwigo.org/svn/extensions/Icy_Picture_Modify/
