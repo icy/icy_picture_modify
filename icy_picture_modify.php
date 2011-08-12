@@ -103,7 +103,7 @@ $my_permissions = null;
 // <community support>
 if (is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
 {
-  include_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'));
+  include_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
   $user_permissions = community_get_user_permissions($user['id']);
   $my_categories = $user_permissions['upload_categories']);
 }
