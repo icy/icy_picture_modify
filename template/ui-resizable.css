@@ -1,3 +1,7 @@
+/* jQuery ui resizable */
+.ui-resizable { position: relative; }
+.ui-wrapper { border: 0; }
+.ui-wrapper input, .ui-wrapper textarea { border: 0; }
 .ui-resizable-handle { position: absolute; display: none; font-size: 0.1px; }
 .ui-resizable .ui-resizable-handle { display: block; }
 body .ui-resizable-disabled .ui-resizable-handle { display: none; } /* use 'body' to make it more specific (css order) */
