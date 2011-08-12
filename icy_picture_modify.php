@@ -91,18 +91,40 @@ if (isset($_SESSION['page_infos']))
   unset($_SESSION['page_infos']);
 }
 
-// <find>
-// find all categories that are reachable for the current user.
-$query = '
-SELECT category_id
-  FROM '.IMAGE_CATEGORY_TABLE.'
-;';
+// <find writable categories>
 
-// list of categories to which the user can access
-$my_categories = array_diff(
-  array_from_query($query, 'category_id'),
-  explode(',',calculate_permissions($user['id'], $user['status'])));
-// </find>
+// * Purpose: Find all categories that are reachable for the current user.
+// * FIXME:   This query will include all readable categories, those ones
+//            use can't write to them.
+
+$my_categories = array();
+$my_permissions = null;
+
+// <community support>
+if (is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
+{
+  include_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'));
+  $user_permissions = community_get_user_permissions($user['id']);
+  $my_categories = $user_permissions['upload_categories']);
+}
+// </community support>
+
+// FIXME: what happens if both of the following conditions are true
+// FIXME:    * true == $user_permissions['create_whole_gallery']
+// FIXME:    * 0    <  count($my_categories)
+if (empty($user_permissions) or $user_permissions['create_whole_gallery'])
+{
+  $query = '
+  SELECT category_id
+    FROM '.IMAGE_CATEGORY_TABLE.'
+  ;';
+
+  // list of categories to which the user can access
+  $my_categories = array_diff(
+    array_from_query($query, 'category_id'),
+    explode(',',calculate_permissions($user['id'], $user['status'])));
+}
+// </find writable categories>
 
 // +-----------------------------------------------------------------------+
 // |                             delete photo                              |
@@ -171,7 +193,9 @@ SELECT path
   array_push($page['infos'], l10n('Metadata synchronized from file'));
 }
 
-//--------------------------------------------------------- update informations
+// +-----------------------------------------------------------------------+
+// |                          update informations                          |
+// +-----------------------------------------------------------------------+
 
 // first, we verify whether there is a mistake on the given creation date
 if (isset($_POST['date_creation_action'])
@@ -239,7 +263,11 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
   array_push($page['infos'], l10n('Photo informations updated'));
 }
 
+// +-----------------------------------------------------------------------+
+// |                              associate                                |
+// +-----------------------------------------------------------------------+
 // associate the element to other categories than its storage category
+//
 if (isset($_POST['associate'])
     and isset($_POST['cat_dissociated'])
     and count($_POST['cat_dissociated']) > 0
@@ -250,6 +278,8 @@ if (isset($_POST['associate'])
     array_intersect($_POST['cat_dissociated'], $my_categories)
     );
 }
+
+
 // dissociate the element from categories (but not from its storage category)
 if (isset($_POST['dissociate'])
     and isset($_POST['cat_associated'])
