@@ -1,3 +1,9 @@
+1.1.0 2011-09-02
+
+  - Compatible with Piwigo 2.2.3, 2.2.4 and 2.2.5 (There are code changes
+    in both Piwigo and this plugin. If you are using Piwigo 2.2.5 you must
+    install/upgrade to this version of the plugin.)
+
 1.0.3 2011-08-12
 
   - Compatible with Piwigo 2.2.3, Piwigo 2.2.4 and the lastest version
