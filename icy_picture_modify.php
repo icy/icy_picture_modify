@@ -331,10 +331,18 @@ if (isset($_POST['dismiss'])
 }
 
 // tags
+if (version_compare(PHPWG_VERSION, '2.2.5', '<')) {
+  $q_tag_selection = "tag_id, name AS tag_name";
+  $q_tags = 'id AS tag_id, name AS tag_name';
+}
+else {
+  $q_tag_selection = "tag_id AS id, name";
+  $q_tags = 'id, name';
+}
+
 $query = '
 SELECT
-    tag_id as id,
-    name
+    '.$q_tag_selection.'
   FROM '.IMAGE_TAG_TABLE.' AS it
     JOIN '.TAGS_TABLE.' AS t ON t.id = it.tag_id
   WHERE image_id = '.$_GET['image_id'].'
@@ -343,8 +351,7 @@ $tag_selection = get_taglist($query);
 
 $query = '
 SELECT
-    id,
-    name
+    '.$q_tags.'
   FROM '.TAGS_TABLE.'
 ;';
 $tags = get_taglist($query);
