@@ -12,14 +12,19 @@ DESCRIPTION
 
 USAGE
 
-  1. Install and enable the plugin "community" which allows users to upload pictures
-  2. Install and enable this extension
+  1. Install and enable the plugin "community" which allows users to
+     upload pictures to some albums. Please configure the plugin before
+     you install "icy_picture_modify".
+
+  2. Install and enable this plugin
+
   3. When users view a picture they uploaded, they will be provided a link
      to modify that picture's information.
 
 FEATURES
 
   Users can modify the following information of a picture
+
     * Author
     * Description
     * Picture's date
@@ -33,11 +38,12 @@ FEATURES
 KNOWN PROBLEMS
 
   * This plugin doesn't support all known templates
-  * This plugin may not work smoothly without plugin 'community'
+
+  * This plugin may not work smoothly without the plugin 'community'
+
   * User can delete an image which is associated to some albums to which
-    the user doesn't have permission to write/access. When the plugin
-    'community' isn't installed, user can create image's link and/or
-    represents for any visible albums in the gallery.
+    the user doesn't have permission to write/access. This is true as the
+    plugin only checks owner of the image.
 
 AUTHOR
 
@@ -50,5 +56,5 @@ LICENSE
 HOMGEPAGE
 
   At Github.com:  https://github.com/icy/icy_picture_modify
-  At Piwigo.com:   http://piwigo.org/ext/extension_view.php?eid=563
-  SVN repository:  http://piwigo.org/svn/extensions/Icy_Picture_Modify/
+  At Piwigo.com:  http://piwigo.org/ext/extension_view.php?eid=563
+  SVN repository: http://piwigo.org/svn/extensions/Icy_Picture_Modify/

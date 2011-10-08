@@ -94,32 +94,32 @@ if (isset($_SESSION['page_infos']))
 // <find writable categories>
 
 // * Purpose: Find all categories that are reachable for the current user.
-// * FIXME:   This query will include all readable categories, those ones
-//            use can't write to them.
+// * FIXME:   This query will include all readable categories, included
+//            the ones user can't write to them.
 
 $my_categories = array();
 $my_permissions = null;
+$has_plugin_community = false;
 
 // <community support>
 if (is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
 {
   include_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
+  $has_plugin_community = true;
+
   $user_permissions = community_get_user_permissions($user['id']);
   $my_categories = $user_permissions['upload_categories'];
 }
 // </community support>
 
-// FIXME: what happens if both of the following conditions are true
-// FIXME:    * true == $user_permissions['create_whole_gallery']
-// FIXME:    * 0    <  count($my_categories)
-if (empty($user_permissions) or $user_permissions['create_whole_gallery'])
+if (($has_plugin_community == false) or $user_permissions['create_whole_gallery'])
 {
   $query = '
   SELECT category_id
     FROM '.IMAGE_CATEGORY_TABLE.'
   ;';
 
-  // list of categories to which the user can access
+  // list of categories to which the user can read
   $my_categories = array_diff(
     array_from_query($query, 'category_id'),
     explode(',',calculate_permissions($user['id'], $user['status'])));
@@ -269,6 +269,7 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
 // associate the element to other categories than its storage category
 //
 if (isset($_POST['associate'])
+    and ($has_plugin_community == true)
     and isset($_POST['cat_dissociated'])
     and count($_POST['cat_dissociated']) > 0
   )
@@ -282,6 +283,7 @@ if (isset($_POST['associate'])
 
 // dissociate the element from categories (but not from its storage category)
 if (isset($_POST['dissociate'])
+    and ($has_plugin_community == true)
     and isset($_POST['cat_associated'])
     and count($_POST['cat_associated']) > 0
   )
@@ -296,8 +298,14 @@ DELETE FROM '.IMAGE_CATEGORY_TABLE.'
 
   update_category($arr_dissociate);
 }
+
+// +-----------------------------------------------------------------------+
+// |                              representation                           |
+// +-----------------------------------------------------------------------+
+
 // select the element to represent the given categories
 if (isset($_POST['elect'])
+    and ($has_plugin_community == true)
     and isset($_POST['cat_dismissed'])
     and count($_POST['cat_dismissed']) > 0
   )
@@ -317,8 +325,10 @@ if (isset($_POST['elect'])
     mass_updates(CATEGORIES_TABLE, $fields, $datas);
   }
 }
+
 // dismiss the element as representant of the given categories
 if (isset($_POST['dismiss'])
+    and ($has_plugin_community == true)
     and isset($_POST['cat_elected'])
     and count($_POST['cat_elected']) > 0
   )
@@ -330,7 +340,10 @@ if (isset($_POST['dismiss'])
   }
 }
 
-// tags
+// +-----------------------------------------------------------------------+
+// |                             tagging support                           |
+// +-----------------------------------------------------------------------+
+
 if (version_compare(PHPWG_VERSION, '2.2.5', '<')) {
   $q_tag_selection = "tag_id, name AS tag_name";
   $q_tags = 'id AS tag_id, name AS tag_name';
@@ -593,7 +606,7 @@ SELECT id,name,uppercats,global_rank
 ;';
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 
-// representing
+// display list of categories for representing
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
