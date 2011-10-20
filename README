@@ -23,24 +23,16 @@ USAGE
 
 FEATURES
 
-  Users can modify the following information of a picture
-
-    * Author
-    * Description
-    * Picture's date
-    * Tags
-    * ACL
-    * Synchronize meta data
-    * Delete picture
-    * Associcate/Dissociated image to/from uploadable category
-    * Use image to represent for uploadable category
+  Users can delete image or modify image's properties (author, date, tags,
+  description, metada, associcate/aissociated/represented categories).
 
 KNOWN PROBLEMS
 
+  * If an image is replaced by other version (using plugin 'Photo update')
+    the author of (new) image will be owned by administrator, not the
+    current user. Hence the image won't be editable anymore
   * This plugin doesn't support all known templates
-
   * This plugin may not work smoothly without the plugin 'community'
-
   * User can delete an image which is associated to some albums to which
     the user doesn't have permission to write/access. This is true as the
     plugin only checks owner of the image.
