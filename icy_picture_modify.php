@@ -27,6 +27,18 @@ if (!defined('ICY_PICTURE_MODIFY_PATH')) die('Hacking attempt!');
 include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
 include_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
 
+/* <ICY_ACL_SUPPORT> */
+
+$ICY_ACL = array();
+/* Local external ACL */
+if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_picture_modify.php') {
+  include_once(PHPWG_ROOT_PATH.'local/config/icy_picture_modify.php');
+}
+
+/* FIXME: Convert community support to ICY_ACL */
+
+/* </ICY_ACL_SUPPORT> */
+
 global $template, $conf, $user, $page, $lang, $cache;
 
 // <admin.php>

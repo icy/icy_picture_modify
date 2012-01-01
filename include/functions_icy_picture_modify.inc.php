@@ -71,4 +71,28 @@ SELECT COUNT(id)
   list($count) = pwg_db_fetch_row(pwg_query($query));
   return ($count > 0 ? true: false);
 }
+
+/*
+ * Check if an image is editable by current user
+ * @icy_acl   access rules (provided by icy module)
+ * @image_id  identity of the image
+ * @return    boolean value
+ * @author    icy
+ */
+function icy_image_editable($icy_acl, $image_id) {
+
+  return false;
+}
+
+/*
+ * Update the ACL by loading known data from plugin 'community'
+ * @icy_acl   current ACL
+ * @priority  community will be overwritten (0) or not (1)
+ * @return    ACL merged with community support
+ * @author    icy
+ * @notes     community supports will be overwritten by default ACL
+ */
+function icy_include_community_acl($icy_acl, $priority = 0) {
+  return $icy_acl;
+}
 ?>
