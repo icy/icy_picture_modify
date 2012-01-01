@@ -48,6 +48,8 @@ SELECT COUNT(id)
 
   list($count) = pwg_db_fetch_row(pwg_query($query));
 
+  icy_log("icy_check_image_owner: image_id, user_id, count = $image_id, $user_id, $count");
+
   return ($count > 0 ? true: false);
 }
 
@@ -79,9 +81,13 @@ SELECT COUNT(id)
  * @return    boolean value
  * @author    icy
  */
-function icy_image_editable($icy_acl, $image_id) {
+function icy_image_editable($image_id, $icy_acl = array()) {
+  global $user;
+  $editable = true;
 
-  return false;
+  $editable = $editable and icy_check_image_owner($image_id, $user['id']);
+
+  return $editable;
 }
 
 /*
@@ -94,5 +100,21 @@ function icy_image_editable($icy_acl, $image_id) {
  */
 function icy_include_community_acl($icy_acl, $priority = 0) {
   return $icy_acl;
+}
+
+/*
+ * Write some logs for debugging
+ * @notes     Data will be written to <ROOT>/_data/icy.log
+ */
+function icy_log($st) {
+  $_f_log = PHPWG_ROOT_PATH.'_data/icy.log';
+  $_f_handle = fopen($f_log, 'a');
+  if ($_f_handle) {
+    fwrite($_f_handle, $st . "\n");
+    fclose($_f_handle);
+  }
+  else {
+    // FIXME: How can report if we can't write to log file?
+  }
 }
 ?>

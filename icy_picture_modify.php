@@ -84,7 +84,8 @@ if (is_admin())
     bad_request('invalid picture identifier');
   }
 }
-elseif (!icy_check_image_owner($_GET['image_id'], $user['id']))
+// FIXME: function name depends on the operation (edit, delete, ...)
+elseif (!icy_image_editable($_GET['image_id']))
 {
   $url = make_picture_url(
       array(
