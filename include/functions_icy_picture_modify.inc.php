@@ -108,7 +108,7 @@ function icy_include_community_acl($icy_acl, $priority = 0) {
  */
 function icy_log($st) {
   $_f_log = PHPWG_ROOT_PATH.'_data/icy.log';
-  $_f_handle = fopen($f_log, 'a');
+  $_f_handle = fopen($_f_log, 'a');
   if ($_f_handle) {
     fwrite($_f_handle, $st . "\n");
     fclose($_f_handle);
