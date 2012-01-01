@@ -136,6 +136,8 @@ if (isset($_GET['delete']))
 
   delete_elements(array($_GET['image_id']), true);
 
+  invalidate_user_cache();
+
   // where to redirect the user now?
   //
   // 1. if a category is available in the URL, use it
@@ -278,6 +280,7 @@ if (isset($_POST['associate'])
     array($_GET['image_id']),
     array_intersect($_POST['cat_dissociated'], $my_categories)
     );
+  invalidate_user_cache();
 }
 
 
@@ -297,6 +300,7 @@ DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   pwg_query($query);
 
   update_category($arr_dissociate);
+  invalidate_user_cache();
 }
 
 // +-----------------------------------------------------------------------+
@@ -323,6 +327,7 @@ if (isset($_POST['elect'])
     $fields = array('primary' => array('id'),
                     'update' => array('representative_picture_id'));
     mass_updates(CATEGORIES_TABLE, $fields, $datas);
+    invalidate_user_cache();
   }
 }
 
@@ -337,6 +342,7 @@ if (isset($_POST['dismiss'])
   if (count($arr_dismiss) > 0)
   {
     set_random_representant($arr_dismiss);
+    invalidate_user_cache();
   }
 }
 
