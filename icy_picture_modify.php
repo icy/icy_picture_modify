@@ -31,7 +31,7 @@ include_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.p
 
 $ICY_ACL = array();
 /* Local external ACL */
-if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php') {
+if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php')) {
   include_once(PHPWG_ROOT_PATH.'local/config/icy_acl.php');
 }
 
