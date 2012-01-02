@@ -145,6 +145,11 @@ SELECT id
   return $user_id;
 }
 
+/*
+ * Check if a plugin is enabled
+ * @plugin_name   name of the plugin
+ * @author        icy
+ */
 function icy_plugin_enabled($plugin_name) {
   $query = '
 SELECT count(id)
