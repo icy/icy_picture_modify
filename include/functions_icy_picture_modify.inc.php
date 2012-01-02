@@ -59,7 +59,7 @@ SELECT COUNT(id)
  * @author icy
  *
 */
-function icy_does_image_exist($image_id)
+function icy_image_exists($image_id)
 {
   if (!preg_match(PATTERN_ID, $image_id))
   {
@@ -85,6 +85,8 @@ function icy_image_editable($image_id, $icy_acl = array()) {
   global $user;
   $editable = true;
 
+  if (!is_admin()) return $editable;
+
   $editable = $editable and icy_check_image_owner($image_id, $user['id']);
 
   return $editable;
@@ -105,6 +107,7 @@ function icy_include_community_acl($icy_acl, $priority = 0) {
 /*
  * Write some logs for debugging
  * @notes     Data will be written to <ROOT>/_data/icy.log
+ * @author    icy
  */
 function icy_log($st) {
   $_f_log = PHPWG_ROOT_PATH.'_data/icy.log';
@@ -114,7 +117,45 @@ function icy_log($st) {
     fclose($_f_handle);
   }
   else {
-    // FIXME: How can report if we can't write to log file?
+    // FIXME: How we can report if we can't write to log file?
   }
+}
+
+/*
+ * Get UserId from their UserName
+ * @user_name   username as string
+ * @author      icy
+ */
+function icy_get_user_id_from_name($user_name) {
+  $user_name = pwg_db_real_escape_string($user_name);
+
+  $query = '
+SELECT id
+  FROM '.USERS_TABLE.'
+  WHERE username = "'.$user_name.'"
+  LIMIT 1
+;';
+
+  list($user_id) = pwg_db_fetch_row(pwg_query($query));
+
+  // FIXME: Is this the best way?
+  if ($user_id == NULL) $user_id = 0;
+
+  icy_log("icy_get_user_id_from_name: map userid <= username: $user_name <= $user_id");
+  return $user_id;
+}
+
+function icy_plugin_enabled($plugin_name) {
+  $query = '
+SELECT count(id)
+  FROM '.PLUGINS_TABLE.'
+  WHERE id = "'.pwg_db_real_escape_string($plugin_name).'"
+  AND state="active"
+  LIMIT 1
+;';
+
+  list($count) = pwg_db_fetch_row(pwg_query($query));
+  icy_log("icy_is_plugin_enabled: plugin, enabled = $plugin_name, $count");
+  return ($count == 1 ? true : false);
 }
 ?>

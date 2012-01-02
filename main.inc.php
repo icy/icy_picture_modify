@@ -50,7 +50,8 @@ function icy_picture_modify_index()
 function icy_picture_modify_loc_begin_picture()
 {
   global $conf, $template, $page, $user;
-  if ((!is_admin()) and icy_check_image_owner($page['image_id'], $user['id']))
+  // FIXME: editable, deletable, ... ? Will check the operation instead
+  if (icy_image_editable($page['image_id']))
   {
     $url_admin =
       get_root_url().'index.php?/icy_picture_modify'

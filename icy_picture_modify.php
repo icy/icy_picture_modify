@@ -24,8 +24,8 @@
 if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
 if (!defined('ICY_PICTURE_MODIFY_PATH')) die('Hacking attempt!');
 
-include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
-include_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
+require_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
+require_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
 
 /* <ICY_ACL_SUPPORT> */
 
@@ -33,8 +33,7 @@ $ICY_ACL = array(); // reset the ACL !!!
 
 /* Local external ACL */
 if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php')) {
-  icy_log("Plugin: Loading ACL from local/config/icy_acl.php");
-  include_once(PHPWG_ROOT_PATH.'local/config/icy_acl.php');
+  require_once(PHPWG_ROOT_PATH.'local/config/icy_acl.php');
 }
 
 /* FIXME: Convert community support to ICY_ACL */
@@ -67,13 +66,15 @@ if (!isset($_GET['image_id']))
   }
 }
 
+// FIXME: check and then !?
 check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
 // Simplify redirect to administrator page if current user == admin
+// FIXME: find a better way to handle this exception
 if (is_admin())
 {
-  if (icy_does_image_exist($_GET['image_id']))
+  if (icy_image_exists($_GET['image_id']))
   {
     $url = get_root_url().'admin.php?page=picture_modify';
     $url.= '&amp;image_id='.$_GET['image_id'];
@@ -83,6 +84,7 @@ if (is_admin())
   }
   else
   {
+    // FIXME: language support ^^
     bad_request('invalid picture identifier');
   }
 }
@@ -116,10 +118,12 @@ $my_categories = array();
 $my_permissions = null;
 $has_plugin_community = false;
 
+// FIXME: Replace code block by (icy_include_community_acl)
 // <community support>
-if (is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
+if (icy_plugin_enabled("community")
+      and is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
 {
-  include_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
+  require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
   $has_plugin_community = true;
 
   $user_permissions = community_get_user_permissions($user['id']);
@@ -127,6 +131,12 @@ if (is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
 }
 // </community support>
 
+// if there isn't any support for community plugin,
+// or if the plugin is enable (FIXME: not true!) and the user
+// can be able to make tasks on all galleries, we would get list of
+// categories of running system and remove all reistricted ones
+// FIXME: Move to common library, func = (icy_get_available_categories)
+// NOTE: A category may be uploadable or not
 if (($has_plugin_community == false) or $user_permissions['create_whole_gallery'])
 {
   $query = '
