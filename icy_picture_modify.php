@@ -155,6 +155,12 @@ if (($has_plugin_community == false) or $user_permissions['create_whole_gallery'
 // |                             delete photo                              |
 // +-----------------------------------------------------------------------+
 
+// ACTION => :delete_image
+// FIXME: replace code block by
+// FIXME:   if (icy_action() == 'delete_image'
+// FIXME:         and icy_image_is_deletable($Image_id) )
+// FIXME:     { # then delete it }
+
 if (isset($_GET['delete']))
 {
   check_pwg_token();
@@ -206,6 +212,10 @@ SELECT category_id
 // +-----------------------------------------------------------------------+
 // |                          synchronize metadata                         |
 // +-----------------------------------------------------------------------+
+
+// ACTION => synchronize_image_metadata
+// This includes other sub-actions and other permissions
+//  (tag update, timestamp updated, ...)
 
 if (isset($_GET['sync_metadata']))
 {
@@ -270,6 +280,7 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
     }
   }
 
+  // FIXME: why mass_updates here ? Used with a simple array?
   mass_updates(
     IMAGES_TABLE,
     array(
@@ -295,6 +306,9 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
 // +-----------------------------------------------------------------------+
 // associate the element to other categories than its storage category
 //
+
+// SUB-ACTION => associate_image_to_gallery
+
 if (isset($_POST['associate'])
     and ($has_plugin_community == true)
     and isset($_POST['cat_dissociated'])
@@ -308,6 +322,7 @@ if (isset($_POST['associate'])
   invalidate_user_cache();
 }
 
+// SUB-ACTION => dissociate_image_from_gallery
 
 // dissociate the element from categories (but not from its storage category)
 if (isset($_POST['dissociate'])
@@ -332,7 +347,9 @@ DELETE FROM '.IMAGE_CATEGORY_TABLE.'
 // |                              representation                           |
 // +-----------------------------------------------------------------------+
 
-// select the element to represent the given categories
+// SUB-ACTION => select the element to represent the given categories
+// FIXME: select or elect?
+
 if (isset($_POST['elect'])
     and ($has_plugin_community == true)
     and isset($_POST['cat_dismissed'])
@@ -356,7 +373,8 @@ if (isset($_POST['elect'])
   }
 }
 
-// dismiss the element as representant of the given categories
+// SUB-ACTION => dismiss the element as representant of the given categories
+
 if (isset($_POST['dismiss'])
     and ($has_plugin_community == true)
     and isset($_POST['cat_elected'])
@@ -374,6 +392,8 @@ if (isset($_POST['dismiss'])
 // +-----------------------------------------------------------------------+
 // |                             tagging support                           |
 // +-----------------------------------------------------------------------+
+
+// FIXME: tag is always updatable?
 
 if (version_compare(PHPWG_VERSION, '2.2.5', '<')) {
   $q_tag_selection = "tag_id, name AS tag_name";
