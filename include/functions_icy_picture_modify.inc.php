@@ -81,7 +81,7 @@ SELECT COUNT(id)
  * @return    boolean value
  * @author    icy
  */
-function icy_image_editable($image_id, $icy_acl = array()) {
+function icy_image_editable($image_id) {
   global $user;
   $editable = true;
 
@@ -100,9 +100,94 @@ function icy_image_editable($image_id, $icy_acl = array()) {
  * @author    icy
  * @notes     community supports will be overwritten by default ACL
  */
-function icy_include_community_acl($icy_acl, $priority = 0) {
-  return $icy_acl;
+function icy_include_community_acl($priority = 0) {
+  global $ICY_ACL;
+  return $ICY_ACL;
 }
+
+/*
+ * Example
+ *  Test if user can upload image to a category
+ *    icy_acl("can_upload_image_to", 12, $owner_of_12th_category)
+ *
+ *  Here he owner of object (12) is provided. There are some cases
+ *
+ *    1.  ACL['can_upload_image_to'] = array(12, 14, 15)
+ *          return: TRUE
+ *
+ *    2a. ACL['can_upload_image_to'] = array(13, 14, 15)
+ *          return: FALSE
+ *
+ *    2b. ACL['can_upload_image_to'] = array(13, 14, 14, $other_user)
+ *          return: FALSE
+ *
+ *    2c. ACL['can_upload_image_to'] = array($owner_of_12th_category)
+ *        ACL['can_upload_image_to'] = array('owner', 14, 15)
+ *          return: TRUE if $this_user == $owner_of_12th_category
+ *
+ *  Test if user can edit image of some other user
+ *    icy_acl("can_edit_image_from", 'khoalong')
+ *      return: TRUE if ACL contains 'khoalong' (or 'owner')
+ *
+ * FIXME: Test if current user is logged in
+ * FIXME: $guestowner must be provided explicitly
+ */
+function icy_acl($symbol, $guestdata, $guestowner = FALSE) {
+  global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
+
+  // Load ACL setting for this user
+  $this_user = $user['username'];
+  $my_acl = $ICY_ACL_DEFAULT;
+  if (array_key_exists($this_user, $ICY_ACL)) {
+    $my_acl = array_replace($my_acl, $ICY_ACL[$this_user]);
+  }
+
+  // Load ACL setting for the symbol
+  if (!array_key_exists($symbol, $my_acl)) return FALSE;
+  $symbol_settings = $my_acl[$symbol];
+
+  // Check if $this_user has enough permission
+  if (is_array($symbol_settings)) {
+    if (in_array($guestdata, $symbol_settings)) {
+      return TRUE;
+    }
+    else {
+      // $guestdata doesn't exist in $symbol_settings. We need to check
+      // if there is 'owner' in the setting. If 'yes', $this_user has
+      // enough permission if they are also the $guestowner.
+      if ($guestowner == $this_user) {
+        // Replace 'owner' by the $guestowner. For example
+        //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
+        array_walk($symbol_settings,
+         create_function('&$val, $key',
+           'if ($val == "owner") {$val = "'.$guestowner.'";}'));
+
+        return in_array($this_user, $symbol_settings);
+      }
+      else {
+        // FIXME: ???
+        return FALSE;
+      }
+    }
+  }
+  else {
+    if ($symbol_settings == 'owner') {
+      return ($guestowner == $this_user);
+    }
+    else {
+      return false;
+    }
+  }
+}
+
+/*
+ * Routine to test if (icy_acl) works as designed
+ *
+function icy_acl_test() {
+  return FALSE;
+}
+ *
+ */
 
 /*
  * Write some logs for debugging

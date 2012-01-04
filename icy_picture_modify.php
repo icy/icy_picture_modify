@@ -30,6 +30,7 @@ require_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.p
 /* <ICY_ACL_SUPPORT> */
 
 $ICY_ACL = array(); // reset the ACL !!!
+$ICY_ACL_DEFAULT = array();
 
 /* Local external ACL */
 if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php')) {
