@@ -51,7 +51,9 @@ function icy_picture_modify_loc_begin_picture()
 {
   global $conf, $template, $page, $user;
   // FIXME: editable, deletable, ... ? Will check the operation instead
-  if (icy_image_editable($page['image_id']))
+  // FIXME: is_admin() won't require us to load ICY_ACL
+  // FIXME: that's why we still stupport it here
+  if (is_admin() or icy_image_editable($page['image_id']))
   {
     $url_admin =
       get_root_url().'index.php?/icy_picture_modify'

@@ -28,29 +28,13 @@
  * @author icy
  *
 */
-function icy_check_image_owner($image_id, $user_id = 0)
+function icy_check_image_owner($image_id)
 {
-  if (!preg_match(PATTERN_ID, $image_id))
-  {
-    bad_request('invalid picture identifier');
-  }
-  if (!preg_match(PATTERN_ID, $user_id))
-  {
-    bad_request('invalid category identifier');
-  }
-
-  $query = '
-SELECT COUNT(id)
-  FROM '.IMAGES_TABLE.'
-  WHERE id = '.$image_id.'
-  AND added_by = '.$user_id.'
-;';
-
-  list($count) = pwg_db_fetch_row(pwg_query($query));
-
-  icy_log("icy_check_image_owner: image_id, user_id, count = $image_id, $user_id, $count");
-
-  return ($count > 0 ? true: false);
+  global $user;
+  icy_log("icy_check_image_owner: current user, is_owner = "
+            . $user['id']. ", "
+            . icy_get_user_owner_of_image($image_id));
+  return $user['id'] == icy_get_user_owner_of_image($image_id);
 }
 
 /*
@@ -82,29 +66,57 @@ SELECT COUNT(id)
  * @author    icy
  */
 function icy_image_editable($image_id) {
-  global $user;
   $editable = true;
 
-  if (!is_admin()) return $editable;
+  if (is_admin()) return $editable;
 
-  $editable = $editable and icy_check_image_owner($image_id, $user['id']);
+  $editable = ($editable and icy_check_image_owner($image_id));
 
+  icy_log("icy_image_editable: image_id, editable = $image_id, $editable");
   return $editable;
 }
 
 /*
- * Update the ACL by loading known data from plugin 'community'
- * @icy_acl   current ACL
- * @priority  community will be overwritten (0) or not (1)
- * @return    ACL merged with community support
- * @author    icy
- * @notes     community supports will be overwritten by default ACL
+ * Return list of visible/uploadable categories
+ * @author  icy
  */
-function icy_include_community_acl($priority = 0) {
-  global $ICY_ACL;
-  return $ICY_ACL;
-}
+function icy_get_visible_categories() {
+  global $user;
 
+  $community_loadded = icy_plugin_community_is_loadable();
+  $community_categories = array();
+  $community_user_permissions = FALSE;
+
+  $visible_categories = array();
+
+  if ($community_loadded) {
+    $community_user_permissions = community_get_user_permissions($user['id']);
+    $community_categories = $community_user_permissions['upload_categories'];
+  }
+
+  // if there isn't any support for community plugin,
+  // or if the plugin is enable (FIXME: not true!) and the user
+  // can be able to make tasks on all galleries, we would get list of
+  // categories of running system and remove all reistricted ones
+  // FIXME: Move to common library, func = (icy_get_available_categories)
+  // NOTE: A category may be uploadable or not
+  if (($community_loadded == false) or $community_user_permissions['create_whole_gallery'])
+  {
+    $query = '
+    SELECT category_id
+      FROM '.IMAGE_CATEGORY_TABLE.'
+    ;';
+
+    // list of categories to which the user can upload images to
+    $community_categories = array_diff(
+      array_from_query($query, 'category_id'),
+      explode(',',calculate_permissions($user['id'], $user['status'])));
+  }
+
+  // filter out the list by ICY_ACL
+
+  return $my_categories;
+}
 /*
  * Example
  *  Test if user can upload image to a category
@@ -132,7 +144,7 @@ function icy_include_community_acl($priority = 0) {
  * FIXME: Test if current user is logged in
  * FIXME: $guestowner must be provided explicitly
  */
-function icy_acl($symbol, $guestdata, $guestowner = FALSE) {
+function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
   global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
 
   // Load ACL setting for this user
@@ -143,7 +155,10 @@ function icy_acl($symbol, $guestdata, $guestowner = FALSE) {
   }
 
   // Load ACL setting for the symbol
-  if (!array_key_exists($symbol, $my_acl)) return FALSE;
+  if (!array_key_exists($symbol, $my_acl)) {
+    icy_log("icy_acl: symbol is invalid => $symbol");
+    return FALSE;
+  }
   $symbol_settings = $my_acl[$symbol];
 
   // Check if $this_user has enough permission
@@ -155,7 +170,7 @@ function icy_acl($symbol, $guestdata, $guestowner = FALSE) {
       // $guestdata doesn't exist in $symbol_settings. We need to check
       // if there is 'owner' in the setting. If 'yes', $this_user has
       // enough permission if they are also the $guestowner.
-      if ($guestowner == $this_user) {
+      if ($guestowner === $this_user) {
         // Replace 'owner' by the $guestowner. For example
         //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
         array_walk($symbol_settings,
@@ -171,11 +186,14 @@ function icy_acl($symbol, $guestdata, $guestowner = FALSE) {
     }
   }
   else {
-    if ($symbol_settings == 'owner') {
-      return ($guestowner == $this_user);
+    if ($symbol_settings === 'owner') {
+      return ($guestowner === $this_user);
+    }
+    elseif (($symbol_settings === TRUE) or ($symbol_settings === "any")) {
+      return TRUE;
     }
     else {
-      return false;
+      return FALSE;
     }
   }
 }
@@ -231,6 +249,30 @@ SELECT id
 }
 
 /*
+ * Rerturn the owner id of an image
+ * @author    icy
+ * @image_id  identity of the image
+ */
+function icy_get_user_owner_of_image($image_id) {
+  // FIXME: Clean this up!!!
+  if (!preg_match(PATTERN_ID, $image_id))
+    bad_request('invalid picture identifier');
+
+  $query = '
+SELECT added_by
+  FROM '.IMAGES_TABLE.'
+  WHERE id = '.$image_id.'
+  LIMIT 1
+;';
+
+  list($owner) = pwg_db_fetch_row(pwg_query($query));
+
+  icy_log("icy_get_user_owner_of_image: image_id, added_by = $image_id, $owner");
+
+  return $owner ? $owner : 0;
+}
+
+/*
  * Check if a plugin is enabled
  * @plugin_name   name of the plugin
  * @author        icy
@@ -247,5 +289,9 @@ SELECT count(id)
   list($count) = pwg_db_fetch_row(pwg_query($query));
   icy_log("icy_is_plugin_enabled: plugin, enabled = $plugin_name, $count");
   return ($count == 1 ? true : false);
+}
+
+function icy_plugin_community_is_loadable() {
+  return icy_acl("load_plugin_community") and icy_plugin_enabled("community");
 }
 ?>

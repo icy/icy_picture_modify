@@ -27,52 +27,7 @@ if (!defined('ICY_PICTURE_MODIFY_PATH')) die('Hacking attempt!');
 require_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
 require_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
 
-/* <ICY_ACL_SUPPORT> */
-
-$ICY_ACL = array(); // reset the ACL !!!
-$ICY_ACL_DEFAULT = array();
-
-/* Local external ACL */
-if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php')) {
-  require_once(PHPWG_ROOT_PATH.'local/config/icy_acl.php');
-}
-
-/* FIXME: Convert community support to ICY_ACL */
-
-/* </ICY_ACL_SUPPORT> */
-
-global $template, $conf, $user, $page, $lang, $cache;
-
-// <admin.php>
-$page['errors'] = array();
-$page['infos']  = array();
-$page['warnings']  = array();
-// </admin.php>
-
-// +-----------------------------------------------------------------------+
-// |                             check permission                          |
-// +-----------------------------------------------------------------------+
-
-// redirect users to the index page or category page if 'image_id' isn't provided
-if (!isset($_GET['image_id']))
-{
-  if (isset($_GET['cat_id']))
-  {
-    redirect_http(get_root_url().'?/category/'.$_GET['cat_id']);
-  }
-  else
-  {
-    // FIXME: $_SESSION['page_infos'] = array(l10n('Permission denied'));
-    redirect_http(make_index_url());
-  }
-}
-
-// FIXME: check and then !?
-check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
-check_input_parameter('image_id', $_GET, false, PATTERN_ID);
-
-// Simplify redirect to administrator page if current user == admin
-// FIXME: find a better way to handle this exception
+// <ADMIN_ONLY>
 if (is_admin())
 {
   if (icy_image_exists($_GET['image_id']))
@@ -89,8 +44,60 @@ if (is_admin())
     bad_request('invalid picture identifier');
   }
 }
+// </ADMIN_ONLY>
+
+global $template, $conf, $user, $page, $lang, $cache;
+
+// <load_from_admin.php>
+$page['errors'] = array();
+$page['infos']  = array();
+$page['warnings']  = array();
+// </load_from_admin.php>
+
+// <ICY_ACL_SUPPORT>
+global $ICY_ACL, $ICY_ACL_DEFAULT;
+
+$ICY_ACL = array();
+$ICY_ACL_DEFAULT = array();
+
+/* Local external ACL */
+if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php'))
+  require_once(PHPWG_ROOT_PATH.'local/config/icy_acl.php');
+/* FIXME: Convert community support to ICY_ACL */
+// </ICY_ACL_SUPPORT>
+
+if (icy_plugin_community_is_loadable()) {
+  icy_log("icy_picture_modify: Loading external plugin community");
+  require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
+}
+
+// +-----------------------------------------------------------------------+
+// |                             check permission                          |
+// +-----------------------------------------------------------------------+
+
+// <CHECK_IF_IMAGE_ID_IS_VALID>
+// redirect users to the index page or category page if 'image_id' isn't provided
+if (!isset($_GET['image_id']))
+{
+  if (isset($_GET['cat_id']))
+  {
+    redirect_http(get_root_url().'?/category/'.$_GET['cat_id']);
+  }
+  else
+  {
+    // FIXME: $_SESSION['page_infos'] = array(l10n('Permission denied'));
+    redirect_http(make_index_url());
+  }
+}
+// </CHECK_IF_IMAGE_ID_IS_VALID>
+
+// FIXME: check and then !?
+check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
+check_input_parameter('image_id', $_GET, false, PATTERN_ID);
+
+// Return if the image isn't editable
 // FIXME: function name depends on the operation (edit, delete, ...)
-elseif (!icy_image_editable($_GET['image_id']))
+if (!icy_image_editable($_GET['image_id']))
 {
   $url = make_picture_url(
       array(
@@ -103,6 +110,7 @@ elseif (!icy_image_editable($_GET['image_id']))
 }
 
 // Update the page sessions
+// FIXME: why?
 if (isset($_SESSION['page_infos']))
 {
   $page['infos'] = array_merge($page['infos'], $_SESSION['page_infos']);
