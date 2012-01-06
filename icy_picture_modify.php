@@ -56,9 +56,7 @@ $page['warnings']  = array();
 
 // <ICY_ACL_SUPPORT>
 global $ICY_ACL, $ICY_ACL_DEFAULT;
-
-$ICY_ACL = array();
-$ICY_ACL_DEFAULT = array();
+require_once(ICY_PICTURE_MODIFY_PATH.'include/icy_acl_default.php');
 
 /* Local external ACL */
 if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php'))
@@ -72,8 +70,8 @@ if (icy_plugin_community_is_loadable()) {
 }
 
 // <testing>
-icy_log("icy_picture_modify: user can upload image to => "
-          . print_r(icy_acl_get_categories("can_upload_image_to"), true));
+//!icy_log("icy_picture_modify: user can upload image to => "
+//!          . print_r(icy_acl_get_categories("can_upload_image_to"), true));
 // </testing>
 
 // +-----------------------------------------------------------------------+
@@ -102,7 +100,8 @@ check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
 // Return if the image isn't editable
 // FIXME: function name depends on the operation (edit, delete, ...)
-if (!icy_image_editable($_GET['image_id']))
+// FIXME: duplicate uses of (icy_get_user_owner_of_image)
+if (icy_acl("can_edit_image_of", $_GET['image_id'], icy_get_user_owner_of_image($_GET['image_id'])))
 {
   $url = make_picture_url(
       array(
@@ -123,47 +122,10 @@ if (isset($_SESSION['page_infos']))
 }
 
 // <find writable categories>
-
-// * Purpose: Find all categories that are reachable for the current user.
-// * FIXME:   This query will include all readable categories, included
-//            the ones user can't write to them.
-
 $my_categories = array();
-$my_permissions = null;
-$has_plugin_community = false;
-
-// FIXME: Replace code block by (icy_include_community_acl)
-// <community support>
-if (icy_plugin_enabled("community")
-      and is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
-{
-  require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
-  $has_plugin_community = true;
-
-  $user_permissions = community_get_user_permissions($user['id']);
-  $my_categories = $user_permissions['upload_categories'];
-}
-// </community support>
-
-// if there isn't any support for community plugin,
-// or if the plugin is enable (FIXME: not true!) and the user
-// can be able to make tasks on all galleries, we would get list of
-// categories of running system and remove all reistricted ones
-// FIXME: Move to common library, func = (icy_get_available_categories)
-// NOTE: A category may be uploadable or not
-if (($has_plugin_community == false) or $user_permissions['create_whole_gallery'])
-{
-  $query = '
-  SELECT category_id
-    FROM '.IMAGE_CATEGORY_TABLE.'
-  ;';
-
-  // list of categories to which the user can read
-  $my_categories = array_diff(
-    array_from_query($query, 'category_id'),
-    explode(',',calculate_permissions($user['id'], $user['status'])));
-}
-// </find writable categories>
+// FIXME: delete this line ^^
+$my_categories = array_from_query('SELECT category_id FROM '
+                        .IMAGE_CATEGORY_TABLE.';', 'category_id');
 
 // +-----------------------------------------------------------------------+
 // |                             delete photo                              |
@@ -175,7 +137,10 @@ if (($has_plugin_community == false) or $user_permissions['create_whole_gallery'
 // FIXME:         and icy_image_is_deletable($Image_id) )
 // FIXME:     { # then delete it }
 
-if (isset($_GET['delete']))
+if (isset($_GET['delete'])
+      and icy_acl("can_delete_image_of",
+            $_GET['image_id'],
+            icy_get_user_owner_of_image($_GET['image_id'])))
 {
   check_pwg_token();
 
@@ -324,15 +289,16 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
 // SUB-ACTION => associate_image_to_gallery
 
 if (isset($_POST['associate'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_dissociated'])
-    and count($_POST['cat_dissociated']) > 0
+    and (count($_POST['cat_dissociated']) > 0)
   )
 {
-  associate_images_to_categories(
-    array($_GET['image_id']),
-    array_intersect($_POST['cat_dissociated'], $my_categories)
-    );
+  $_categories = array_intersect($_POST['cat_dissociated'],
+                    icy_acl_get_categories("can_associate_image_to"));
+  $_categories = array_filter($_categories,
+      create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
+
+  associate_images_to_categories(array($_GET['image_id']), $_categories);
   invalidate_user_cache();
 }
 
@@ -340,20 +306,24 @@ if (isset($_POST['associate'])
 
 // dissociate the element from categories (but not from its storage category)
 if (isset($_POST['dissociate'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_associated'])
     and count($_POST['cat_associated']) > 0
   )
 {
-  $arr_dissociate = array_intersect($_POST['cat_associated'], $my_categories);
+
+  $_categories = array_intersect($_POST['cat_associated'],
+                    icy_acl_get_categories("can_associate_image_to"));
+  $_categories = array_filter($_categories,
+      create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
+
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   WHERE image_id = '.$_GET['image_id'].'
-    AND category_id IN ('.implode(',', $arr_dissociate).')
+    AND category_id IN (0,'.join(',', $_categories).')
 ';
-  pwg_query($query);
 
-  update_category($arr_dissociate);
+  pwg_query($query);
+  update_category($_categories);
   invalidate_user_cache();
 }
 
@@ -635,15 +605,17 @@ if (isset($url_img))
   $template->assign( 'U_JUMPTO', $url_img );
 }
 
-// associate to another category ?
+// Select list of categories this image is associcated to
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
     INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
   WHERE image_id = '.$_GET['image_id'] . '
-    AND id IN ('. join(",", $my_categories).')';
-// if the image belongs to a physical storage,
-// we simply ignore that storage album
+    AND id IN (0,'
+        . join(",",icy_acl_get_categories("can_associate_image_to"))
+    .')';
+// FIMXE: if the image belongs to a physical storage,
+// FIXME: we simply ignore that storage album
 if (isset($storage_category_id))
 {
   $query.= '
@@ -667,7 +639,9 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE id NOT IN ('.implode(',', $associateds).')
-  AND id IN ('. join(",", $my_categories).')
+  AND id IN (0,'
+        . join(",", icy_acl_get_categories("can_associate_image_to"))
+    .')
 ;';
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 

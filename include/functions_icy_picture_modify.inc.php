@@ -31,9 +31,9 @@
 function icy_check_image_owner($image_id)
 {
   global $user;
-  icy_log("icy_check_image_owner: current user, is_owner = "
-            . $user['id']. ", "
-            . icy_get_user_owner_of_image($image_id));
+  //! icy_log("icy_check_image_owner: current user, is_owner = "
+  //!           . $user['id']. ", "
+  //!           . icy_get_user_owner_of_image($image_id));
   return $user['id'] == icy_get_user_owner_of_image($image_id);
 }
 
@@ -92,7 +92,7 @@ function icy_acl_get_data($symbol) {
 
   // Load ACL setting for the symbol
   if (!array_key_exists($symbol, $my_acl)) {
-    icy_log("icy_acl: symbol is invalid => $symbol");
+    icy_log("icy_acl_get_data: WARNING: symbol is invalid => $symbol");
     return NULL;
   }
 
@@ -153,9 +153,9 @@ function icy_acl_get_categories($symbol) {
                     + $community_user_permissions['upload_categories'];
     }
     else {
-      icy_log("icy_acl_get_categories: generic symbol => $symbol; intial categories => "
-              . print_r($symbol_categories, true));
       $symbol_categories = $symbol_settings;
+      icy_log("icy_acl_get_categories: generic symbol => $symbol; initial categories => "
+              . print_r($symbol_categories, true));
     }
   }
   else {
@@ -167,19 +167,21 @@ function icy_acl_get_categories($symbol) {
   // remove all forbidden categories from the list
   // TODO: support negative directive in ICY_ACL
   $symbol_categories = array_values(array_intersect($symbol_categories, $all_categories));
-  if (icy_acl_get_data("can_work_on_sub_album") == TRUE) {
-    icy_log("icy_acl_get_categories: user is allowed to work on sub-album. size(before) => "
-      . count($symbol_categories) . ", data => ". print_r($symbol_categories, true));
+  if (icy_acl_get_data($symbol."_sub_album") === TRUE) {
+    //! icy_log("icy_acl_get_categories: user is allowed to work on sub-album. size(before) => "
+    //!  . count($symbol_categories) . ", data => ". print_r($symbol_categories, true));
     // FIXME: (get_subcat_ids) requires a 0-based array
     $symbol_categories = $symbol_categories + get_subcat_ids($symbol_categories);
-    icy_log("icy_acl_get_categories: and size(after) => " . count($symbol_categories));
+    //! icy_log("icy_acl_get_categories: and size(after) => " . count($symbol_categories));
   }
   $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
-  icy_log("icy_acl_get_categories: final categories => " . print_r($symbol_categories, true));
+  //! icy_log("icy_acl_get_categories: final categories => " . print_r($symbol_categories, true));
   return array_values($symbol_categories);
 }
 /*
- * Example
+ * FIXME: Fix these comments :)
+ * EXAMPLE:
+ *
  *  Test if user can upload image to a category
  *    icy_acl("can_upload_image_to", 12, $owner_of_12th_category)
  *
@@ -321,9 +323,7 @@ SELECT added_by
 ;';
 
   list($owner) = pwg_db_fetch_row(pwg_query($query));
-
   icy_log("icy_get_user_owner_of_image: image_id, added_by = $image_id, $owner");
-
   return $owner ? $owner : 0;
 }
 
@@ -333,6 +333,8 @@ SELECT added_by
  * @author        icy
  */
 function icy_plugin_enabled($plugin_name) {
+  $return = false;
+
   $query = '
 SELECT count(id)
   FROM '.PLUGINS_TABLE.'
@@ -343,7 +345,15 @@ SELECT count(id)
 
   list($count) = pwg_db_fetch_row(pwg_query($query));
   icy_log("icy_is_plugin_enabled: plugin, enabled = $plugin_name, $count");
-  return ($count == 1 ? true : false);
+  $return = ($count == 1 ? true : false);
+
+  // we need the file ^^
+  if ($plugin_name == "community")
+    $return = $return
+                and is_file(PHPWG_PLUGINS_PATH
+                  .'community/include/functions_community.inc.php');
+
+  return $return;
 }
 
 function icy_plugin_community_is_loadable() {
