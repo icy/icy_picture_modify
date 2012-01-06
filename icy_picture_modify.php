@@ -71,6 +71,11 @@ if (icy_plugin_community_is_loadable()) {
   require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
 }
 
+// <testing>
+icy_log("icy_picture_modify: user can upload image to => "
+          . print_r(icy_acl_get_categories("can_upload_image_to"), true));
+// </testing>
+
 // +-----------------------------------------------------------------------+
 // |                             check permission                          |
 // +-----------------------------------------------------------------------+

@@ -80,42 +80,103 @@ function icy_image_editable($image_id) {
  * Return list of visible/uploadable categories
  * @author  icy
  */
-function icy_get_visible_categories() {
+function icy_acl_get_data($symbol) {
+  global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
+
+  // Load ACL setting for this user
+  $this_user = $user['username'];
+  $my_acl = $ICY_ACL_DEFAULT;
+  if (array_key_exists($this_user, $ICY_ACL)) {
+    $my_acl = array_replace($my_acl, $ICY_ACL[$this_user]);
+  }
+
+  // Load ACL setting for the symbol
+  if (!array_key_exists($symbol, $my_acl)) {
+    icy_log("icy_acl: symbol is invalid => $symbol");
+    return NULL;
+  }
+
+  return $my_acl[$symbol];
+}
+
+/*
+ *
+ * visible: upload, assosiate,...
+ * @symbol    must be ended by "_to" or "_from"
+ */
+function icy_acl_get_categories($symbol) {
   global $user;
 
-  $community_loadded = icy_plugin_community_is_loadable();
-  $community_categories = array();
-  $community_user_permissions = FALSE;
+  $all_categories = array();
+  $symbol_categories = array();
+  $symbol_settings = NULL;
 
-  $visible_categories = array();
+  icy_log("icy_acl_get_categories: inspect data for symbol => $symbol");
 
-  if ($community_loadded) {
-    $community_user_permissions = community_get_user_permissions($user['id']);
-    $community_categories = $community_user_permissions['upload_categories'];
+  // check if $symbol is valid
+  if (!preg_match("/_(to|from)$/", $symbol)) return $symbol_categories;
+  $symbol_settings = icy_acl_get_data($symbol);
+  icy_log("icy_acl_get_categories: data for symbol $symbol => "
+            . print_r($symbol_settings, true));
+  if (!$symbol_settings) {
+    return $symbol_categories;
   }
 
-  // if there isn't any support for community plugin,
-  // or if the plugin is enable (FIXME: not true!) and the user
-  // can be able to make tasks on all galleries, we would get list of
-  // categories of running system and remove all reistricted ones
-  // FIXME: Move to common library, func = (icy_get_available_categories)
-  // NOTE: A category may be uploadable or not
-  if (($community_loadded == false) or $community_user_permissions['create_whole_gallery'])
-  {
-    $query = '
-    SELECT category_id
-      FROM '.IMAGE_CATEGORY_TABLE.'
-    ;';
+  // all known categories in the system
+  $query = 'SELECT category_id FROM '.IMAGE_CATEGORY_TABLE.';';
+  $all_categories = array_from_query($query, 'category_id');
+  $forbidden_categories = explode(',',calculate_permissions($user['id'], $user['status']));
 
-    // list of categories to which the user can upload images to
-    $community_categories = array_diff(
-      array_from_query($query, 'category_id'),
-      explode(',',calculate_permissions($user['id'], $user['status'])));
+  // ICY_ACL allows user to access all categories. In this case,
+  // the plugin 'community' plays an empty role (we just supress it)
+  if (icy_acl_symbol_data_wide_open($symbol_settings)) {
+    icy_log("icy_acl_get_categories: symbol is too open => $symbol");
+    $symbol_categories = $all_categories;
+  }
+  elseif (is_array($symbol_settings)) {
+    if ($symbol == "can_upload_image_to") {
+      // <community_support>
+      // See also (plugins/community/include/functions_community.inc.php)
+      $community_user_permissions = array(
+          "upload_categories" => array(), // can_upload_image_to
+          "create_categories" => array(), // NOTE: isn't ported to ICY_ACL
+          "upload_whole_gallery" => FALSE // FIXME: isn't ported to ICY_ACL
+          // NOTE: attribute 'recursive' isn't ported
+        );
+      if (icy_plugin_community_is_loadable()) {
+        $community_user_permissions = community_get_user_permissions($user['id']);
+        icy_log("icy_acl_get_categories: will get extra categories from plugin community => "
+                . print_r($community_user_permissions, true));
+      }
+      // </community_support>
+      $symbol_categories = $symbol_settings
+                    + $community_user_permissions['upload_categories'];
+    }
+    else {
+      icy_log("icy_acl_get_categories: generic symbol => $symbol; intial categories => "
+              . print_r($symbol_categories, true));
+      $symbol_categories = $symbol_settings;
+    }
+  }
+  else {
+    // not wide-open, not an-array. So waht!?
+    // $symbol_settings = array();
   }
 
-  // filter out the list by ICY_ACL
-
-  return $my_categories;
+  // Make sure categories are in our sytem
+  // remove all forbidden categories from the list
+  // TODO: support negative directive in ICY_ACL
+  $symbol_categories = array_values(array_intersect($symbol_categories, $all_categories));
+  if (icy_acl_get_data("can_work_on_sub_album") == TRUE) {
+    icy_log("icy_acl_get_categories: user is allowed to work on sub-album. size(before) => "
+      . count($symbol_categories) . ", data => ". print_r($symbol_categories, true));
+    // FIXME: (get_subcat_ids) requires a 0-based array
+    $symbol_categories = $symbol_categories + get_subcat_ids($symbol_categories);
+    icy_log("icy_acl_get_categories: and size(after) => " . count($symbol_categories));
+  }
+  $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
+  icy_log("icy_acl_get_categories: final categories => " . print_r($symbol_categories, true));
+  return array_values($symbol_categories);
 }
 /*
  * Example
@@ -149,17 +210,7 @@ function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
 
   // Load ACL setting for this user
   $this_user = $user['username'];
-  $my_acl = $ICY_ACL_DEFAULT;
-  if (array_key_exists($this_user, $ICY_ACL)) {
-    $my_acl = array_replace($my_acl, $ICY_ACL[$this_user]);
-  }
-
-  // Load ACL setting for the symbol
-  if (!array_key_exists($symbol, $my_acl)) {
-    icy_log("icy_acl: symbol is invalid => $symbol");
-    return FALSE;
-  }
-  $symbol_settings = $my_acl[$symbol];
+  $symbol_settings = icy_acl_get_data($symbol);
 
   // Check if $this_user has enough permission
   if (is_array($symbol_settings)) {
@@ -189,13 +240,17 @@ function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
     if ($symbol_settings === 'owner') {
       return ($guestowner === $this_user);
     }
-    elseif (($symbol_settings === TRUE) or ($symbol_settings === "any")) {
+    elseif (icy_acl_symbol_data_wide_open($symbol_settings)) {
       return TRUE;
     }
     else {
       return FALSE;
     }
   }
+}
+
+function icy_acl_symbol_data_wide_open($symbol_data) {
+  return ($symbol_data === TRUE) or ($symbol_data === "any");
 }
 
 /*
