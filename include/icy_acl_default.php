@@ -21,8 +21,8 @@ $ICY_ACL_DEFAULT =  // Default rules for logged in users
     'can_upload_image_to_sub_album' => TRUE,
     'can_associate_image_to' => FALSE,
     'can_associate_image_to_sub_album' => TRUE,
-    'can_present_to' => FALSE,
-    'can_present_to_sub_album' => TRUE,
+    'can_present_image_to' => FALSE,
+    'can_present_image_to_sub_album' => TRUE,
     /* other properties */
     'load_plugin_community' => TRUE
   );

@@ -132,10 +132,6 @@ $my_categories = array_from_query('SELECT category_id FROM '
 // +-----------------------------------------------------------------------+
 
 // ACTION => :delete_image
-// FIXME: replace code block by
-// FIXME:   if (icy_action() == 'delete_image'
-// FIXME:         and icy_image_is_deletable($Image_id) )
-// FIXME:     { # then delete it }
 
 if (isset($_GET['delete'])
       and icy_acl("can_delete_image_of",
@@ -295,8 +291,8 @@ if (isset($_POST['associate'])
 {
   $_categories = array_intersect($_POST['cat_dissociated'],
                     icy_acl_get_categories("can_associate_image_to"));
-  $_categories = array_filter($_categories,
-      create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
+  //! $_categories = array_filter($_categories,
+  //!    create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
 
   associate_images_to_categories(array($_GET['image_id']), $_categories);
   invalidate_user_cache();
@@ -313,13 +309,13 @@ if (isset($_POST['dissociate'])
 
   $_categories = array_intersect($_POST['cat_associated'],
                     icy_acl_get_categories("can_associate_image_to"));
-  $_categories = array_filter($_categories,
-      create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
+  //! $_categories = array_filter($_categories,
+  //!    create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
 
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   WHERE image_id = '.$_GET['image_id'].'
-    AND category_id IN (0,'.join(',', $_categories).')
+    AND category_id IN (0'.join(',', $_categories).')
 ';
 
   pwg_query($query);
@@ -335,13 +331,14 @@ DELETE FROM '.IMAGE_CATEGORY_TABLE.'
 // FIXME: select or elect?
 
 if (isset($_POST['elect'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_dismissed'])
     and count($_POST['cat_dismissed']) > 0
   )
 {
   $datas = array();
-  $arr_dimissed = array_intersect($_POST['cat_dismissed'], $my_categories);
+  $arr_dimissed = array_intersect($_POST['cat_dismissed'],
+                        icy_acl_get_categories("can_present_image_to"));
+
   if (count($arr_dimissed) > 0)
   {
     foreach ($arr_dimissed as $category_id)
@@ -365,7 +362,8 @@ if (isset($_POST['dismiss'])
     and count($_POST['cat_elected']) > 0
   )
 {
-  $arr_dismiss = array_intersect($_POST['cat_elected'], $my_categories);
+  $arr_dismiss = array_intersect($_POST['cat_elected'],
+                        icy_acl_get_categories("can_present_image_to"));
   if (count($arr_dismiss) > 0)
   {
     set_random_representant($arr_dismiss);
@@ -611,7 +609,7 @@ SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
     INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
   WHERE image_id = '.$_GET['image_id'] . '
-    AND id IN (0,'
+    AND id IN (0'
         . join(",",icy_acl_get_categories("can_associate_image_to"))
     .')';
 // FIMXE: if the image belongs to a physical storage,
@@ -639,7 +637,7 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE id NOT IN ('.implode(',', $associateds).')
-  AND id IN (0,'
+  AND id IN (0'
         . join(",", icy_acl_get_categories("can_associate_image_to"))
     .')
 ;';
@@ -650,14 +648,14 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE representative_picture_id = '.$_GET['image_id'].'
-    AND id IN ('. join(",", $my_categories).')
+    AND id IN (0'. join(",", icy_acl_get_categories("can_present_image_to")).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
 
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
-  WHERE id IN ('. join(",", $my_categories).')
+  WHERE id IN (0'. join(",", icy_acl_get_categories("can_present_image_to")).')
     AND (representative_picture_id != '.$_GET['image_id'].'
     OR representative_picture_id IS NULL)
 ;';
