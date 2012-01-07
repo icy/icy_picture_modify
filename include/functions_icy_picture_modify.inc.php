@@ -207,7 +207,7 @@ function icy_acl_get_categories($symbol) {
  * FIXME: Test if current user is logged in
  * FIXME: $guestowner must be provided explicitly
  */
-function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
+ function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
   global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
 
   // Load ACL setting for this user
@@ -223,7 +223,7 @@ function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
       // $guestdata doesn't exist in $symbol_settings. We need to check
       // if there is 'owner' in the setting. If 'yes', $this_user has
       // enough permission if they are also the $guestowner.
-      if ($guestowner === $this_user) {
+      if ($guestowner == $this_user) {
         // Replace 'owner' by the $guestowner. For example
         //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
         array_walk($symbol_settings,
@@ -326,6 +326,26 @@ SELECT added_by
   icy_log("icy_get_user_owner_of_image: image_id, added_by = $image_id, $owner");
   return $owner ? $owner : 0;
 }
+
+/***********************************************************************
+
+function icy_get_username_of($user_id) {
+  if (!preg_match(PATTERN_ID, $user_id))
+    bad_request('invalid user identifier');
+
+  $query = '
+SELECT username
+  FROM '.USERS_TABLE.'
+  WHERE id = '.$user_id.'
+  LIMIT 1
+;';
+
+  list($username) = pwg_db_fetch_row(pwg_query($query));
+  icy_log("icy_get_username_of: user_id, user_name = $user_id, $username");
+  return $username;
+}
+
+***********************************************************************/
 
 /*
  * Check if a plugin is enabled
