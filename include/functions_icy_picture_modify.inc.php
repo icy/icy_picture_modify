@@ -218,7 +218,7 @@ function icy_acl_get_categories($symbol) {
       //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
       array_walk($symbol_settings,
        create_function('&$val, $key',
-         'if ($val == "owner") {$val = "'.$guestowner.'";}'));
+         'if ($val == "owner") {$val = "'.$user['username'].'";}'));
       return in_array($guestowner, $symbol_settings);
     }
     else {
