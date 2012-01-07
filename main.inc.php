@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Icy Modify Picture
-Version: 1.1.0
+Version: 1.2.0
 Description: Allow users to modify pictures they uploaded
 Plugin URI: http://piwigo.org/ext/extension_view.php?eid=563
 Author: icy
@@ -50,9 +50,9 @@ function icy_picture_modify_index()
 function icy_picture_modify_loc_begin_picture()
 {
   global $conf, $template, $page, $user;
-  // FIXME: editable, deletable, ... ? Will check the operation instead
-  // FIXME: is_admin() won't require us to load ICY_ACL
-  // FIXME: that's why we still stupport it here
+
+  icy_acl_load_configuration();
+
   if (is_admin() or icy_image_editable($page['image_id']))
   {
     $url_admin =

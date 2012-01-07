@@ -54,20 +54,7 @@ $page['infos']  = array();
 $page['warnings']  = array();
 // </load_from_admin.php>
 
-// <ICY_ACL_SUPPORT>
-global $ICY_ACL, $ICY_ACL_DEFAULT;
-require_once(ICY_PICTURE_MODIFY_PATH.'include/icy_acl_default.php');
-
-/* Local external ACL */
-if (file_exists(PHPWG_ROOT_PATH.'local/config/icy_acl.php'))
-  require_once(PHPWG_ROOT_PATH.'local/config/icy_acl.php');
-/* FIXME: Convert community support to ICY_ACL */
-// </ICY_ACL_SUPPORT>
-
-if (icy_plugin_community_is_loadable()) {
-  icy_log("icy_picture_modify: Loading external plugin community");
-  require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
-}
+icy_acl_load_configuration();
 
 // <testing>
 //!icy_log("icy_picture_modify: user can upload image to => "
@@ -99,9 +86,7 @@ check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
 // Return if the image isn't editable
-// FIXME: function name depends on the operation (edit, delete, ...)
-// FIXME: duplicate uses of (icy_get_user_owner_of_image)
-if (icy_acl("can_edit_image_of", $_GET['image_id'], icy_get_user_owner_of_image($_GET['image_id'])))
+if (!icy_acl("can_edit_image_of", $_GET['image_id'], icy_get_user_owner_of_image($_GET['image_id'])))
 {
   $url = make_picture_url(
       array(
@@ -651,7 +636,6 @@ SELECT id,name,uppercats,global_rank
     AND id IN (0'. join(",", icy_acl_get_categories("can_present_image_to")).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
-icy_log("testxxxxx => " . print_r(icy_acl_get_categories("can_present_image_to"), true));
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'

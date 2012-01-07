@@ -66,11 +66,10 @@ SELECT COUNT(id)
  * @author    icy
  */
 function icy_image_editable($image_id) {
-  $editable = true;
+  // FIMXE: is this really necessary?
+  if (is_admin()) return TRUE;
 
-  if (is_admin()) return $editable;
-
-  $editable = ($editable and icy_check_image_owner($image_id));
+  $editable = icy_acl("can_edit_image_of", $image_id, icy_get_user_owner_of_image($image_id));
 
   icy_log("icy_image_editable: image_id, editable = $image_id, $editable");
   return $editable;
@@ -212,7 +211,7 @@ function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
   global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
 
   // Load ACL setting for this user
-  $this_user = $user['username'];
+  $this_user = $user['id'];
   $symbol_settings = icy_acl_get_data($symbol);
 
   // Check if $this_user has enough permission
@@ -357,7 +356,29 @@ SELECT count(id)
   return $return;
 }
 
+/*
+ * Check if the plugin 'community' is loadable by the current user
+ * @author    icy
+ */
 function icy_plugin_community_is_loadable() {
   return icy_acl("load_plugin_community") and icy_plugin_enabled("community");
+}
+
+/*
+ * Load ICY_ACL configuration from files
+ * @author   icy
+ */
+function icy_acl_load_configuration() {
+  global $ICY_ACL, $ICY_ACL_DEFAULT;
+  require_once(ICY_PICTURE_MODIFY_PATH.'include/icy_acl_default.php');
+
+  /* Local external ACL */
+  if (file_exists(PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.php'))
+    require_once(PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.php');
+
+  if (icy_plugin_community_is_loadable()) {
+    icy_log("icy_picture_modify: Loading external plugin community");
+    require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
+  }
 }
 ?>
