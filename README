@@ -1,45 +1,92 @@
 NAME
 
-  icy_picture_modify -- Allow user to modify their pictures
+  icy_picture_modify -- Allow user to modify any pictures
 
 DESCRIPTION
 
-  A piwigo extension that allows users to modify pictures they uploaded.
+  A piwigo extension that allows users to edit any set of images.
   This extension just works as the 'picture_modify.php' for administrator.
 
   The code of this plugin is heavily based on the original source
   'picture_modify.php' of the Piwigo distribution (version 2.2.3.)
 
+  Advanced ACL is supported since version 1.2.0.
+
 USAGE
 
-  1. Install and enable the plugin "community" which allows users to
-     upload pictures to some albums. Please configure the plugin before
-     you install "icy_picture_modify".
+  1. Install and enable this plugin
 
-  2. Install and enable this plugin
+  2. (Optional) Install and enable the plugin "community" which allows
+     users to upload pictures to some albums.
 
-  3. When users view a picture they uploaded, they will be provided a link
-     to modify that picture's information.
+     This step is optional, but it may be very useful if you want to have
+     a quick start: The plugin "community" has a good UI to control its
+     behavior, but this plugin heavily depends on text-based configuration.
+
+     Please see the section WORKING WITH PLUGIN COMMUNITY for details.
+
+  3. Create and edit the file "local/config/icy_acl.php". A sample file
+     can be found in the directory "doc" of the plugin.
+
+  4. When user views an image which is editable by them, a link will
+     be provided to user; following that link will bring user to special
+     page in which user can enter new information for the image.
+
+     The place of the depends on the theme' settings. You can see a demo
+     in the screenshot "doc/icy_picture_modify_edit_link.jpg": it's the
+     third icon next to the heart icon.
 
 FEATURES
 
   Users can delete image or modify image's properties (author, date, tags,
   description, metada, associcate/aissociated/represented categories).
 
+  Advanced ACL allow users to work with any set of images / categories.
+
+WORKING WITH PLUGIN COMMUNITY
+
+  Differences
+
+    The plugin 'community' is very good, but its current version has some
+    limitations:
+
+    (1) There are only two cases
+        - User can upload images to any categories in the gallery, or
+        - User can only upload images to a gallery and its sub galleries.
+    (2) Doesn't allow user to edit information of user' picture.
+
+    The first versions of 'icy_picture_modify' solve the problem (2).
+    Since version 1.2.0, the problem (1) is also resolved.
+
+  Working together
+
+    When both plugins are enabled, 'icy_picture_modify' will read list
+    of categories to which user can uplaod images and append such list
+    to settings in $ICY_ACL.
+
 KNOWN PROBLEMS
 
-  * If an image is replaced by other version (using plugin 'Photo update')
-    the author of (new) image will be owned by administrator, not the
-    current user. Hence the image won't be editable anymore
+  * No webUI for ACL editting
   * This plugin doesn't support all known templates
-  * This plugin may not work smoothly without the plugin 'community'
   * User can delete an image which is associated to some albums to which
     the user doesn't have permission to write/access. This is true as the
     plugin only checks owner of the image.
 
+SUPPORT
+
+  To get support, please create new issue at
+    https://github.com/icy/icy_picture_modify/issues
+
+HELP WANTED
+
+  The plugin requires a webUI for ACL editting. Unfortunately, the author
+  isn't good at template system used by Piwigo. Feel free to help us to
+  write a webUI :)
+
 AUTHOR
 
-  Anh K. Huỳnh (icy)
+  Anh K. Huỳnh, email: kyanh@viettug.org,
+                nickname on Piwigo's forum: icy
 
 LICENSE
 

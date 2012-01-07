@@ -1,6 +1,6 @@
 1.2.0 2012-01-07
 
-  - Support advance ACL in local file <ROOT/local/config/icy_acl.php>
+  - Support advanced ACL in local file <ROOT/local/config/icy_acl.php>
 
 1.1.0 2011-09-02
 

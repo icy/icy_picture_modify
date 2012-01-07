@@ -56,11 +56,6 @@ $page['warnings']  = array();
 
 icy_acl_load_configuration();
 
-// <testing>
-//!icy_log("icy_picture_modify: user can upload image to => "
-//!          . print_r(icy_acl_get_categories("can_upload_image_to"), true));
-// </testing>
-
 // +-----------------------------------------------------------------------+
 // |                             check permission                          |
 // +-----------------------------------------------------------------------+
@@ -587,15 +582,14 @@ if (isset($url_img))
   $template->assign( 'U_JUMPTO', $url_img );
 }
 
+$_categories = icy_acl_get_categories("can_associate_image_to");
 // Select list of categories this image is associcated to
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
     INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
   WHERE image_id = '.$_GET['image_id'] . '
-    AND id IN (0'
-        . join(",",icy_acl_get_categories("can_associate_image_to"))
-    .')';
+    AND id IN (0'.join(",",$_categories).')';
 // FIMXE: if the image belongs to a physical storage,
 // FIXME: we simply ignore that storage album
 if (isset($storage_category_id))
@@ -622,24 +616,23 @@ $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE id NOT IN ('.implode(',', $associateds).')
-  AND id IN (0'
-        . join(",", icy_acl_get_categories("can_associate_image_to"))
-    .')
+  AND id IN (0'.join(",", $_categories).')
 ;';
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 
 // display list of categories for representing
+$_categories = icy_acl_get_categories("can_present_image_to");
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE representative_picture_id = '.$_GET['image_id'].'
-    AND id IN (0'. join(",", icy_acl_get_categories("can_present_image_to")).')
+    AND id IN (0'. join(",", $_categories).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
-  WHERE id IN (0'. join(",", icy_acl_get_categories("can_present_image_to")).')
+  WHERE id IN (0'. join(",", $_categories).')
     AND (representative_picture_id != '.$_GET['image_id'].'
     OR representative_picture_id IS NULL)
 ;';
