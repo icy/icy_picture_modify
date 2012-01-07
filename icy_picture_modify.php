@@ -357,7 +357,6 @@ if (isset($_POST['elect'])
 // SUB-ACTION => dismiss the element as representant of the given categories
 
 if (isset($_POST['dismiss'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_elected'])
     and count($_POST['cat_elected']) > 0
   )
@@ -633,6 +632,7 @@ while ($row = pwg_db_fetch_assoc($result))
 {
   array_push($associateds, $row['id']);
 }
+  // FIXME: Also display some forbidden presentations
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
@@ -651,7 +651,7 @@ SELECT id,name,uppercats,global_rank
     AND id IN (0'. join(",", icy_acl_get_categories("can_present_image_to")).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
-
+icy_log("testxxxxx => " . print_r(icy_acl_get_categories("can_present_image_to"), true));
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'

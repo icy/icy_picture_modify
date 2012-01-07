@@ -96,6 +96,7 @@ function icy_acl_get_data($symbol) {
     return NULL;
   }
 
+  //! icy_log("... icy_acl_get_data: fetched data for $symbol");
   return $my_acl[$symbol];
 }
 
@@ -123,8 +124,8 @@ function icy_acl_get_categories($symbol) {
   }
 
   // all known categories in the system
-  $query = 'SELECT category_id FROM '.IMAGE_CATEGORY_TABLE.';';
-  $all_categories = array_from_query($query, 'category_id');
+  $query = 'SELECT id FROM '.CATEGORIES_TABLE.';';
+  $all_categories = array_unique(array_from_query($query, 'id'));
   $forbidden_categories = explode(',',calculate_permissions($user['id'], $user['status']));
 
   // ICY_ACL allows user to access all categories. In this case,
@@ -149,8 +150,8 @@ function icy_acl_get_categories($symbol) {
                 . print_r($community_user_permissions, true));
       }
       // </community_support>
-      $symbol_categories = $symbol_settings
-                    + $community_user_permissions['upload_categories'];
+      $symbol_categories = array_merge($symbol_settings,
+                        $community_user_permissions['upload_categories']);
     }
     else {
       $symbol_categories = $symbol_settings;
@@ -167,12 +168,12 @@ function icy_acl_get_categories($symbol) {
   // remove all forbidden categories from the list
   // TODO: support negative directive in ICY_ACL
   $symbol_categories = array_values(array_intersect($symbol_categories, $all_categories));
-  if (icy_acl_get_data($symbol."_sub_album") === TRUE) {
+  if (icy_acl_get_data($symbol."_sub_album")) {
     //! icy_log("icy_acl_get_categories: user is allowed to work on sub-album. size(before) => "
     //!  . count($symbol_categories) . ", data => ". print_r($symbol_categories, true));
     // FIXME: (get_subcat_ids) requires a 0-based array
-    $symbol_categories = $symbol_categories + get_subcat_ids($symbol_categories);
-    //! icy_log("icy_acl_get_categories: and size(after) => " . count($symbol_categories));
+    $symbol_categories = array_merge($symbol_categories, get_subcat_ids($symbol_categories));
+    icy_log("icy_acl_get_categories: sub album allowed, new size(after) => " . count($symbol_categories));
   }
   $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
   //! icy_log("icy_acl_get_categories: final categories => " . print_r($symbol_categories, true));
