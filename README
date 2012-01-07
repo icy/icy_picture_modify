@@ -61,7 +61,7 @@ WORKING WITH PLUGIN COMMUNITY
   Working together
 
     When both plugins are enabled, 'icy_picture_modify' will read list
-    of categories to which user can uplaod images and append such list
+    of categories to which user can upload images and append such list
     to settings in $ICY_ACL.
 
 KNOWN PROBLEMS
@@ -97,3 +97,4 @@ HOMGEPAGE
   At Github.com:  https://github.com/icy/icy_picture_modify
   At Piwigo.com:  http://piwigo.org/ext/extension_view.php?eid=563
   SVN repository: http://piwigo.org/svn/extensions/Icy_Picture_Modify/
+  A useful topic: http://piwigo.org/forum/viewtopic.php?id=17745
