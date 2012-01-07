@@ -373,11 +373,13 @@ function icy_acl_load_configuration() {
   require_once(ICY_PICTURE_MODIFY_PATH.'include/icy_acl_default.php');
 
   /* Local external ACL */
-  if (file_exists(PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.php'))
+  if (file_exists(PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.php')) {
+    icy_log("icy_acl_load_configuration: Loading local ICY_ACL");
     require_once(PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.php');
+  }
 
   if (icy_plugin_community_is_loadable()) {
-    icy_log("icy_picture_modify: Loading external plugin community");
+    icy_log("icy_acl_load_configuration: Loading external plugin community");
     require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
   }
 }
