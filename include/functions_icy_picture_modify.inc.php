@@ -381,4 +381,13 @@ function icy_acl_load_configuration() {
     require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
   }
 }
+
+if (!function_exists('array_replace')) {
+  function array_replace() {
+    $array=array();
+    $n=func_num_args();
+    while ($n-- >0) $array+=func_get_arg($n);
+    return $array;
+  }
+}
 ?>
