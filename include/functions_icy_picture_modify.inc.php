@@ -179,33 +179,25 @@ function icy_acl_get_categories($symbol) {
   return array_values($symbol_categories);
 }
 /*
- * FIXME: Fix these comments :)
- * EXAMPLE:
- *
- *  Test if user can upload image to a category
- *    icy_acl("can_upload_image_to", 12, $owner_of_12th_category)
- *
- *  Here he owner of object (12) is provided. There are some cases
- *
- *    1.  ACL['can_upload_image_to'] = array(12, 14, 15)
- *          return: TRUE
- *
- *    2a. ACL['can_upload_image_to'] = array(13, 14, 15)
- *          return: FALSE
- *
- *    2b. ACL['can_upload_image_to'] = array(13, 14, 14, $other_user)
- *          return: FALSE
- *
- *    2c. ACL['can_upload_image_to'] = array($owner_of_12th_category)
- *        ACL['can_upload_image_to'] = array('owner', 14, 15)
- *          return: TRUE if $this_user == $owner_of_12th_category
- *
- *  Test if user can edit image of some other user
- *    icy_acl("can_edit_image_from", 'khoalong')
- *      return: TRUE if ACL contains 'khoalong' (or 'owner')
- *
  * FIXME: Test if current user is logged in
  * FIXME: $guestowner must be provided explicitly
+ *
+ * Check if the current user has permission to do something
+ * @symbol     Action to be checked
+ * @guestdata  Object of the action
+ * @guestowner Owner of @guestdata
+ *
+ * There are two cases of @symbol:
+ * - _from/_to: action on an category
+ * - _of      : action on the author
+ * - others   : boolean flag
+ *
+ * There are three cases of symbol data
+ * - Array of categories (' identities)    [_from/_to]
+ *    $guestowner is simply ignored
+ * - Array of usernames (list of authors)  [_of]
+ *    $guestowner must be specified
+ * - Others: {"any", "owner", TRUE, FALSE} [others]
  */
  function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
   global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
@@ -214,28 +206,22 @@ function icy_acl_get_categories($symbol) {
   $this_user = $user['id'];
   $symbol_settings = icy_acl_get_data($symbol);
 
-  // Check if $this_user has enough permission
+  // If $symbol_settings is an array
+  //
   if (is_array($symbol_settings)) {
-    if (in_array($guestdata, $symbol_settings)) {
-      return TRUE;
+    if (preg_match("/_(to|from)$/", $symbol)) {
+      return in_array($guestdata, $symbol_settings);
+    }
+    elseif (preg_match("/_of$/", $symbol)) {
+      $guestowner = icy_get_username_of($guestowner);
+      // Replace 'owner' by the $guestowner. For example
+      //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
+      array_walk($symbol_settings,
+       create_function('&$val, $key',
+         'if ($val == "owner") {$val = "'.$guestowner.'";}'));
+      return in_array($guestowner, $symbol_settings);
     }
     else {
-      // $guestdata doesn't exist in $symbol_settings. We need to check
-      // if there is 'owner' in the setting. If 'yes', $this_user has
-      // enough permission if they are also the $guestowner.
-      if ($guestowner == $this_user) {
-        // Replace 'owner' by the $guestowner. For example
-        //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
-        array_walk($symbol_settings,
-         create_function('&$val, $key',
-           'if ($val == "owner") {$val = "'.$guestowner.'";}'));
-
-        return in_array($this_user, $symbol_settings);
-      }
-      else {
-        // FIXME: ???
-        return FALSE;
-      }
     }
   }
   else {
@@ -327,8 +313,9 @@ SELECT added_by
   return $owner ? $owner : 0;
 }
 
-/***********************************************************************
-
+/*
+ * Return the username from user_id
+ */
 function icy_get_username_of($user_id) {
   if (!preg_match(PATTERN_ID, $user_id))
     bad_request('invalid user identifier');
@@ -344,8 +331,6 @@ SELECT username
   icy_log("icy_get_username_of: user_id, user_name = $user_id, $username");
   return $username;
 }
-
-***********************************************************************/
 
 /*
  * Check if a plugin is enabled
