@@ -1,6 +1,9 @@
 1.2.0 2012-01-07
 
   - Support advanced ACL in local file <ROOT/local/config/icy_acl.php>
+    + Allow user to edit images in any set of categories
+    + Allow user to (dis)associate image (from)to any categories
+    + Allow user to upload images to any categories
 
 1.1.0 2011-09-02
 
