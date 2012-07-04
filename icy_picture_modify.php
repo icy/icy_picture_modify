@@ -448,7 +448,7 @@ $template->assign(
     )
   );
 
-if ($row['has_high'] == 'true')
+if (array_key_exists('has_high', $row) and $row['has_high'] == 'true')
 {
   $template->assign(
     'HIGH_FILESIZE',
