@@ -1,4 +1,4 @@
-1.1.1 2012-07-04
+1.1.2 2012-07-04
 
   - Make plugin compatible with Piwigo 2.3.5
   - Fix minor bugs. Fix caching issue when updating images.

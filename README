@@ -31,8 +31,11 @@ KNOWN PROBLEMS
   * If an image is replaced by other version (using plugin 'Photo update')
     the author of (new) image will be owned by administrator, not the
     current user. Hence the image won't be editable anymore
+
   * This plugin doesn't support all known templates
+
   * This plugin may not work smoothly without the plugin 'community'
+
   * User can delete an image which is associated to some albums to which
     the user doesn't have permission to write/access. This is true as the
     plugin only checks owner of the image.
@@ -50,3 +53,4 @@ HOMGEPAGE
   At Github.com:  https://github.com/icy/icy_picture_modify
   At Piwigo.com:  http://piwigo.org/ext/extension_view.php?eid=563
   SVN repository: http://piwigo.org/svn/extensions/Icy_Picture_Modify/
+  Forum link:     http://piwigo.org/forum/viewtopic.php?pid=131585#p131585

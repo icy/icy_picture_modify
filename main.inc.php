@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Icy Modify Picture
-Version: 1.1.1
+Version: 1.1.2
 Description: Allow users to modify pictures they uploaded
 Plugin URI: http://piwigo.org/ext/extension_view.php?eid=563
 Author: icy
