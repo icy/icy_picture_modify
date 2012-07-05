@@ -1,6 +1,6 @@
 1.1.2 2012-07-04
 
-  - Make plugin compatible with Piwigo 2.3.5
+  - Make plugin compatible with Piwigo 2.3.5 and Piwigo 2.4.1
   - Fix minor bugs. Fix caching issue when updating images.
 
 1.1.0 2011-09-02
