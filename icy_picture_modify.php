@@ -46,7 +46,7 @@ if (is_admin())
 }
 // </ADMIN_ONLY>
 
-global $template, $conf, $user, $page, $lang, $cache;
+global $template, $conf, $user, $page, $lang, $cache, $ICY_ACL;
 
 // <load_from_admin.php>
 $page['errors'] = array();
@@ -54,6 +54,7 @@ $page['infos']  = array();
 $page['warnings']  = array();
 // </load_from_admin.php>
 
+#! icy_log("body from icy_picture_modify.php");
 icy_acl_load_configuration();
 
 // +-----------------------------------------------------------------------+
@@ -81,7 +82,7 @@ check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
 // Return if the image isn't editable
-if (!icy_acl("can_edit_image_of", $_GET['image_id'], icy_get_user_owner_of_image($_GET['image_id'])))
+if (!icy_acl("edit_image_of", $_GET['image_id'], icy_get_user_owner_of_image($_GET['image_id'])))
 {
   $url = make_picture_url(
       array(
@@ -114,7 +115,7 @@ $my_categories = array_from_query('SELECT category_id FROM '
 // ACTION => :delete_image
 
 if (isset($_GET['delete'])
-      and icy_acl("can_delete_image_of",
+      and icy_acl("delete_image_of",
             $_GET['image_id'],
             icy_get_user_owner_of_image($_GET['image_id'])))
 {
@@ -270,9 +271,9 @@ if (isset($_POST['associate'])
   )
 {
   $_categories = array_intersect($_POST['cat_dissociated'],
-                    icy_acl_get_categories("can_associate_image_to"));
+                    icy_acl_get_categories("associate_image_to"));
   //! $_categories = array_filter($_categories,
-  //!    create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
+  //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
 
   associate_images_to_categories(array($_GET['image_id']), $_categories);
   invalidate_user_cache();
@@ -288,9 +289,9 @@ if (isset($_POST['dissociate'])
 {
 
   $_categories = array_intersect($_POST['cat_associated'],
-                    icy_acl_get_categories("can_associate_image_to"));
+                    icy_acl_get_categories("associate_image_to"));
   //! $_categories = array_filter($_categories,
-  //!    create_function('$item', 'return icy_acl("can_associate_image_to", $item);'));
+  //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
 
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
@@ -317,7 +318,7 @@ if (isset($_POST['elect'])
 {
   $datas = array();
   $arr_dimissed = array_intersect($_POST['cat_dismissed'],
-                        icy_acl_get_categories("can_present_image_to"));
+                        icy_acl_get_categories("present_image_to"));
 
   if (count($arr_dimissed) > 0)
   {
@@ -342,7 +343,7 @@ if (isset($_POST['dismiss'])
   )
 {
   $arr_dismiss = array_intersect($_POST['cat_elected'],
-                        icy_acl_get_categories("can_present_image_to"));
+                        icy_acl_get_categories("present_image_to"));
   if (count($arr_dismiss) > 0)
   {
     set_random_representant($arr_dismiss);
@@ -582,7 +583,7 @@ if (isset($url_img))
   $template->assign( 'U_JUMPTO', $url_img );
 }
 
-$_categories = icy_acl_get_categories("can_associate_image_to");
+$_categories = icy_acl_get_categories("associate_image_to");
 // Select list of categories this image is associcated to
 $query = '
 SELECT id,name,uppercats,global_rank
@@ -621,7 +622,7 @@ SELECT id,name,uppercats,global_rank
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 
 // display list of categories for representing
-$_categories = icy_acl_get_categories("can_present_image_to");
+$_categories = icy_acl_get_categories("present_image_to");
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'

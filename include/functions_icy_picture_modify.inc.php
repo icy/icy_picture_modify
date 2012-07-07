@@ -31,9 +31,6 @@
 function icy_check_image_owner($image_id)
 {
   global $user;
-  //! icy_log("icy_check_image_owner: current user, is_owner = "
-  //!           . $user['id']. ", "
-  //!           . icy_get_user_owner_of_image($image_id));
   return $user['id'] == icy_get_user_owner_of_image($image_id);
 }
 
@@ -66,12 +63,7 @@ SELECT COUNT(id)
  * @author    icy
  */
 function icy_image_editable($image_id) {
-  // FIMXE: is this really necessary?
-  if (is_admin()) return TRUE;
-
-  $editable = icy_acl("can_edit_image_of", $image_id, icy_get_user_owner_of_image($image_id));
-
-  icy_log("icy_image_editable: image_id, editable = $image_id, $editable");
+  $editable = icy_acl("edit_image_of", $image_id, icy_get_user_owner_of_image($image_id));
   return $editable;
 }
 
@@ -80,22 +72,20 @@ function icy_image_editable($image_id) {
  * @author  icy
  */
 function icy_acl_get_data($symbol) {
-  global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
+  global $user, $ICY_ACL;
 
   // Load ACL setting for this user
   $this_user = $user['username'];
-  $my_acl = $ICY_ACL_DEFAULT;
+  $my_acl = $ICY_ACL['default'];
   if (array_key_exists($this_user, $ICY_ACL)) {
     $my_acl = array_replace($my_acl, $ICY_ACL[$this_user]);
   }
 
   // Load ACL setting for the symbol
   if (!array_key_exists($symbol, $my_acl)) {
-    icy_log("icy_acl_get_data: WARNING: symbol is invalid => $symbol");
     return NULL;
   }
 
-  //! icy_log("... icy_acl_get_data: fetched data for $symbol");
   return $my_acl[$symbol];
 }
 
@@ -105,19 +95,23 @@ function icy_acl_get_data($symbol) {
  * @symbol    must be ended by "_to" or "_from"
  */
 function icy_acl_get_categories($symbol) {
-  global $user;
+  global $user, $conf;
 
   $all_categories = array();
   $symbol_categories = array();
   $symbol_settings = NULL;
 
-  icy_log("icy_acl_get_categories: inspect data for symbol => $symbol");
+  // It's always EMPTY array for any kind of guests
+  if ($user['id'] == $conf['guest_id']) {
+    return $symbol_categories;
+  }
 
   // check if $symbol is valid
-  if (!preg_match("/_(to|from)$/", $symbol)) return $symbol_categories;
+  if (!preg_match("/_(to|from)$/", $symbol)) {
+    return $symbol_categories;
+  }
+
   $symbol_settings = icy_acl_get_data($symbol);
-  icy_log("icy_acl_get_categories: data for symbol $symbol => "
-            . print_r($symbol_settings, true));
   if (!$symbol_settings) {
     return $symbol_categories;
   }
@@ -130,52 +124,25 @@ function icy_acl_get_categories($symbol) {
   // ICY_ACL allows user to access all categories. In this case,
   // the plugin 'community' plays an empty role (we just supress it)
   if (icy_acl_symbol_data_wide_open($symbol_settings)) {
-    icy_log("icy_acl_get_categories: symbol is too open => $symbol");
     $symbol_categories = $all_categories;
   }
   elseif (is_array($symbol_settings)) {
-    if ($symbol == "can_upload_image_to") {
-      // <community_support>
-      // See also (plugins/community/include/functions_community.inc.php)
-      $community_user_permissions = array(
-          "upload_categories" => array(), // can_upload_image_to
-          "create_categories" => array(), // NOTE: isn't ported to ICY_ACL
-          "upload_whole_gallery" => FALSE // FIXME: isn't ported to ICY_ACL
-          // NOTE: attribute 'recursive' isn't ported
-        );
-      if (icy_plugin_community_is_loadable()) {
-        $community_user_permissions = community_get_user_permissions($user['id']);
-        icy_log("icy_acl_get_categories: will get extra categories from plugin community => "
-                . print_r($community_user_permissions, true));
-      }
-      // </community_support>
-      $symbol_categories = array_merge($symbol_settings,
-                        $community_user_permissions['upload_categories']);
-    }
-    else {
-      $symbol_categories = $symbol_settings;
-      icy_log("icy_acl_get_categories: generic symbol => $symbol; initial categories => "
-              . print_r($symbol_categories, true));
-    }
+    $symbol_categories = array_values(array_intersect($symbol_settings, $all_categories));
   }
   else {
     // not wide-open, not an-array. So waht!?
-    // $symbol_settings = array();
+    $symbol_settings = array();
   }
 
   // Make sure categories are in our sytem
   // remove all forbidden categories from the list
-  // TODO: support negative directive in ICY_ACL
-  $symbol_categories = array_values(array_intersect($symbol_categories, $all_categories));
-  if (icy_acl_get_data($symbol."_sub_album")) {
-    //! icy_log("icy_acl_get_categories: user is allowed to work on sub-album. size(before) => "
-    //!  . count($symbol_categories) . ", data => ". print_r($symbol_categories, true));
+  if (in_array('sub', icy_acl_get_data($symbol))) {
     // FIXME: (get_subcat_ids) requires a 0-based array
-    $symbol_categories = array_merge($symbol_categories, get_subcat_ids($symbol_categories));
-    icy_log("icy_acl_get_categories: sub album allowed, new size(after) => " . count($symbol_categories));
+    // FIXME: + array(0) is really a trick :) In Piwigo 2.4, (get_subcat_ids)
+    // FIXME: will generate NOTICE (SQL syntax error) if $symbol_categories is empty.
+    $symbol_categories = array_merge($symbol_categories, get_subcat_ids($symbol_categories + array(0)));
   }
   $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
-  //! icy_log("icy_acl_get_categories: final categories => " . print_r($symbol_categories, true));
   return array_values($symbol_categories);
 }
 /*
@@ -200,16 +167,27 @@ function icy_acl_get_categories($symbol) {
  * - Others: {"any", "owner", TRUE, FALSE} [others]
  */
  function icy_acl($symbol, $guestdata = NULL, $guestowner = NULL) {
-  global $user, $ICY_ACL, $ICY_ACL_DEFAULT;
+  global $user, $ICY_ACL, $conf;
 
   // Load ACL setting for this user
   $this_user = $user['id'];
+
+  if ($user['id'] == $conf['guest_id']) {
+    return FALSE;
+  }
+  elseif (is_admin()) {
+    return TRUE;
+  }
+
   $symbol_settings = icy_acl_get_data($symbol);
 
   // If $symbol_settings is an array
   //
   if (is_array($symbol_settings)) {
-    if (preg_match("/_(to|from)$/", $symbol)) {
+    if (icy_acl_symbol_data_wide_open($symbol_settings)) {
+      return TRUE;
+    }
+    elseif (preg_match("/_(to|from)$/", $symbol)) {
       return in_array($guestdata, $symbol_settings);
     }
     elseif (preg_match("/_of$/", $symbol)) {
@@ -222,48 +200,40 @@ function icy_acl_get_categories($symbol) {
       return in_array($guestowner, $symbol_settings);
     }
     else {
+      # FIXME: why?
+      return FALSE;
     }
   }
   else {
-    if ($symbol_settings === 'owner') {
-      return ($guestowner === $this_user);
-    }
-    elseif (icy_acl_symbol_data_wide_open($symbol_settings)) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+    return is_bool($symbol_settings) ? $symbol_settings: FALSE;
   }
 }
 
 function icy_acl_symbol_data_wide_open($symbol_data) {
-  return ($symbol_data === TRUE) or ($symbol_data === "any");
+  return (is_array($symbol_data) and in_array("any", $symbol_data));
 }
-
-/*
- * Routine to test if (icy_acl) works as designed
- *
-function icy_acl_test() {
-  return FALSE;
-}
- *
- */
 
 /*
  * Write some logs for debugging
- * @notes     Data will be written to <ROOT>/_data/icy.log
+ * @notes     Data will be written to STDERRR (default)
+ *            or to file `<ROOT>/_data/icy.log`
  * @author    icy
  */
-function icy_log($st) {
-  $_f_log = PHPWG_ROOT_PATH.'_data/icy.log';
-  $_f_handle = fopen($_f_log, 'a');
-  if ($_f_handle) {
-    fwrite($_f_handle, $st . "\n");
-    fclose($_f_handle);
+function icy_log($st, $stderr = FALSE) {
+  if ($stderr === TRUE) {
+    $_f_log = "php://stderr";
   }
   else {
-    // FIXME: How we can report if we can't write to log file?
+    $_f_log = PHPWG_ROOT_PATH.'_data/icy.log';
+  }
+
+  $_f_handle = fopen($_f_log, 'a');
+  if ($_f_handle) {
+    $new_line = "\n";
+    fwrite($_f_handle, "piwigo/icy_picture_modify: $st". $new_line );
+    if ($stderr !== TRUE) {
+      fclose($_f_handle);
+    }
   }
 }
 
@@ -287,7 +257,7 @@ SELECT id
   // FIXME: Is this the best way?
   if ($user_id == NULL) $user_id = 0;
 
-  icy_log("icy_get_user_id_from_name: map userid <= username: $user_name <= $user_id");
+  #! icy_log("icy_get_user_id_from_name: map userid <= username: $user_name <= $user_id");
   return $user_id;
 }
 
@@ -309,7 +279,7 @@ SELECT added_by
 ;';
 
   list($owner) = pwg_db_fetch_row(pwg_query($query));
-  icy_log("icy_get_user_owner_of_image: image_id, added_by = $image_id, $owner");
+  #! icy_log("icy_get_user_owner_of_image: image_id, added_by = $image_id, $owner");
   return $owner ? $owner : 0;
 }
 
@@ -328,7 +298,7 @@ SELECT username
 ;';
 
   list($username) = pwg_db_fetch_row(pwg_query($query));
-  icy_log("icy_get_username_of: user_id, user_name = $user_id, $username");
+  #! icy_log("icy_get_username_of: user_id, user_name = $user_id, $username");
   return $username;
 }
 
@@ -349,7 +319,6 @@ SELECT count(id)
 ;';
 
   list($count) = pwg_db_fetch_row(pwg_query($query));
-  icy_log("icy_is_plugin_enabled: plugin, enabled = $plugin_name, $count");
   $return = ($count == 1 ? true : false);
 
   // we need the file ^^
@@ -362,32 +331,147 @@ SELECT count(id)
 }
 
 /*
- * Check if the plugin 'community' is loadable by the current user
- * @author    icy
- */
-function icy_plugin_community_is_loadable() {
-  return icy_acl("load_plugin_community") and icy_plugin_enabled("community");
-}
-
-/*
  * Load ICY_ACL configuration from files
  * @author   icy
  */
-function icy_acl_load_configuration() {
-  global $ICY_ACL, $ICY_ACL_DEFAULT;
-  require_once(ICY_PICTURE_MODIFY_PATH.'include/icy_acl_default.php');
+function icy_acl_load_configuration($force = FALSE) {
+  global $ICY_ACL;
+  $conf_path = PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.zml';
 
-  /* Local external ACL */
-  if (file_exists(PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.php')) {
-    icy_log("icy_acl_load_configuration: Loading local ICY_ACL");
-    require_once(PHPWG_ROOT_PATH.PWG_LOCAL_DIR.'config/icy_acl.php');
+  if (($force == FALSE)
+      and isset($ICY_ACL['default'])
+      and isset($_SESSION['icy_picture_modify_acl_mtime'])
+      and ($_SESSION['icy_picture_modify_acl_mtime'] != filemtime($conf_path))) {
+    #! icy_log("icy_acl_load_configuration: configuration is up-to-date");
+    return FALSE;
   }
 
-  if (icy_plugin_community_is_loadable()) {
-    icy_log("icy_acl_load_configuration: Loading external plugin community");
-    require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
+  $ICY_ACL = icy_zml_parser(<<<EOF
+default:
+  edit_image_of: owner
+  delete_image_of:
+  upload_image_to: sub
+  moderate_image: no
+  create_gallery_to: sub
+  associate_image_to:
+  present_image_to: sub
+EOF
+);
+
+  if (file_exists($conf_path)) {
+    #! icy_log("icy_acl_load_configuration: now loading ACL from $conf_path");
+    $ICY_ACL = array_replace($ICY_ACL, icy_zml_parser(file($conf_path)));
+    $_SESSION['icy_picture_modify_acl_mtime'] = filemtime($conf_path);
   }
+
+  return TRUE;
 }
+
+/*
+ * Return array of variable from a `.zml` array  / string
+ * Syntax of the `.zml` file can be found in `doc/zml.txt`
+ * @author icy
+ */
+function icy_zml_parser($data) {
+  $acl = array();
+  $author = 'default';
+  $acl[$author] = array();
+
+  if (is_string($data)) {
+    $data = preg_split("/[\r\n]/", $data);
+  }
+
+  foreach($data as $line) {
+    # AUTHOR:
+    if (preg_match('/^([^[:space:]:]+):$/', $line, $gs)) {
+      $author = trim($gs[1]);
+      if (! array_key_exists($author, $acl)) {
+        $acl[$author] = array();
+      }
+      continue;
+    }
+
+    # AUTHOR: @REFERENCE
+    if (preg_match('/^([^[:space:]:]+):[[:space:]]+@([^[:space:]:]+)$/', $line, $gs)) {
+      $ref_author = trim($gs[2]);
+      if (!array_key_exists($ref_author, $acl)) {
+        continue;
+      }
+      $author = trim($gs[1]);
+      if (! array_key_exists($author, $acl)) {
+        $acl[$author] = array();
+      }
+      $acl[$author] = array_replace($acl[$ref_author], $acl[$author]);
+    }
+
+    # <two spaces> KEY: [VALUE]
+    if (preg_match('/  ([^:]+):(.*)$/', $line, $gs)) {
+      $key = $gs[1];
+      $val = trim($gs[2]);
+      if (in_array($val, array("","false","no"))) {
+        $val = FALSE;
+      }
+      elseif (in_array($val, array("yes", "true"))) {
+        $val = TRUE;
+      }
+      else {
+        $val = array_unique(preg_split("/[[:space:],:;]+/", $val));
+      }
+      $acl[$author][$key] = $val;
+    }
+
+    # Other line is ignored :)
+  }
+  return $acl;
+}
+
+/*
+ * Overwrite the ACl setings from community plugin
+ * @author: icy
+ */
+function icy_acl_fix_community($force = FALSE) {
+  global $user, $_SESSION;
+
+  if (!icy_plugin_enabled("community")) {
+    return TRUE;
+  }
+
+  require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
+
+  # <community_support>
+  $cache_key = community_get_cache_key();
+  if (!isset($cache_key))  {
+    $cache_key = community_update_cache_key();
+  }
+
+  if (($force == FALSE)
+      and isset($_SESSION['community_user_permissions'])
+      and isset($_SESSION['community_user_permissions']['icy_acl_fixed'])) {
+    #! icy_log("icy_fix_community_acl: the fix is up-to-date " . print_r($_SESSION['community_user_permissions'], true));
+    return TRUE;
+  }
+
+  # icy_log("WARNING: icy_fix_community_acl: the fix is out-of-date. will fix it again");
+  # </community_support>
+
+  $return = array(
+    'create_categories' => array(),
+    'upload_categories' => array(),
+    'permission_ids' => array(),
+    );
+
+  $return['upload_whole_gallery'] = icy_acl_symbol_data_wide_open(icy_acl_get_data("upload_image_to"));
+  $return['create_whole_gallery'] = icy_acl_symbol_data_wide_open(icy_acl_get_data("create_gallery_to"));
+  $return['upload_categories'] = icy_acl_get_categories("upload_image_to");
+  $return['create_categories'] = icy_acl_get_categories("create_gallery_to");
+  $return['permission_ids'] = array();
+  $return['icy_acl_fixed'] = 1;
+
+  $_SESSION['community_user_permissions'] = $return;
+  $_SESSION['community_cache_key'] = $cache_key;
+  $_SESSION['community_user_id'] = $user['id'];
+}
+
 
 if (!function_exists('array_replace')) {
   function array_replace() {
