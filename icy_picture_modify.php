@@ -24,21 +24,44 @@
 if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
 if (!defined('ICY_PICTURE_MODIFY_PATH')) die('Hacking attempt!');
 
-include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
-include_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
+require_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
+require_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
 
-global $template, $conf, $user, $page, $lang, $cache;
+// <ADMIN_ONLY>
+if (is_admin())
+{
+  if (icy_image_exists($_GET['image_id']))
+  {
+    $url = get_root_url().'admin.php?page=picture_modify';
+    $url.= '&amp;image_id='.$_GET['image_id'];
+    $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
+    // FIXME: What happens if a POST data were sent within admin uid?
+    redirect_http($url);
+  }
+  else
+  {
+    // FIXME: language support ^^
+    bad_request('invalid picture identifier');
+  }
+}
+// </ADMIN_ONLY>
 
-// <admin.php>
+global $template, $conf, $user, $page, $lang, $cache, $ICY_ACL;
+
+// <load_from_admin.php>
 $page['errors'] = array();
 $page['infos']  = array();
 $page['warnings']  = array();
-// </admin.php>
+// </load_from_admin.php>
+
+#! icy_log("body from icy_picture_modify.php");
+icy_acl_load_configuration();
 
 // +-----------------------------------------------------------------------+
 // |                             check permission                          |
 // +-----------------------------------------------------------------------+
 
+// <CHECK_IF_IMAGE_ID_IS_VALID>
 // redirect users to the index page or category page if 'image_id' isn't provided
 if (!isset($_GET['image_id']))
 {
@@ -52,27 +75,14 @@ if (!isset($_GET['image_id']))
     redirect_http(make_index_url());
   }
 }
+// </CHECK_IF_IMAGE_ID_IS_VALID>
 
+// FIXME: check and then !?
 check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
-// Simplify redirect to administrator page if current user == admin
-if (is_admin())
-{
-  if (icy_does_image_exist($_GET['image_id']))
-  {
-    $url = get_root_url().'admin.php?page=picture_modify';
-    $url.= '&amp;image_id='.$_GET['image_id'];
-    $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
-    // FIXME: What happens if a POST data were sent within admin uid?
-    redirect_http($url);
-  }
-  else
-  {
-    bad_request('invalid picture identifier');
-  }
-}
-elseif (!icy_check_image_owner($_GET['image_id'], $user['id']))
+// Return if the image isn't editable
+if (!icy_acl("edit_image_of", $_GET['image_id'], icy_get_user_owner_of_image($_GET['image_id'])))
 {
   $url = make_picture_url(
       array(
@@ -85,6 +95,7 @@ elseif (!icy_check_image_owner($_GET['image_id'], $user['id']))
 }
 
 // Update the page sessions
+// FIXME: why?
 if (isset($_SESSION['page_infos']))
 {
   $page['infos'] = array_merge($page['infos'], $_SESSION['page_infos']);
@@ -92,45 +103,21 @@ if (isset($_SESSION['page_infos']))
 }
 
 // <find writable categories>
-
-// * Purpose: Find all categories that are reachable for the current user.
-// * FIXME:   This query will include all readable categories, included
-//            the ones user can't write to them.
-
 $my_categories = array();
-$my_permissions = null;
-$has_plugin_community = false;
-
-// <community support>
-if (is_file(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php'))
-{
-  include_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
-  $has_plugin_community = true;
-
-  $user_permissions = community_get_user_permissions($user['id']);
-  $my_categories = $user_permissions['upload_categories'];
-}
-// </community support>
-
-if (($has_plugin_community == false) or $user_permissions['create_whole_gallery'])
-{
-  $query = '
-  SELECT category_id
-    FROM '.IMAGE_CATEGORY_TABLE.'
-  ;';
-
-  // list of categories to which the user can read
-  $my_categories = array_diff(
-    array_from_query($query, 'category_id'),
-    explode(',',calculate_permissions($user['id'], $user['status'])));
-}
-// </find writable categories>
+// FIXME: delete this line ^^
+$my_categories = array_from_query('SELECT category_id FROM '
+                        .IMAGE_CATEGORY_TABLE.';', 'category_id');
 
 // +-----------------------------------------------------------------------+
 // |                             delete photo                              |
 // +-----------------------------------------------------------------------+
 
-if (isset($_GET['delete']))
+// ACTION => :delete_image
+
+if (isset($_GET['delete'])
+      and icy_acl("delete_image_of",
+            $_GET['image_id'],
+            icy_get_user_owner_of_image($_GET['image_id'])))
 {
   check_pwg_token();
 
@@ -181,6 +168,10 @@ SELECT category_id
 // +-----------------------------------------------------------------------+
 // |                          synchronize metadata                         |
 // +-----------------------------------------------------------------------+
+
+// ACTION => synchronize_image_metadata
+// This includes other sub-actions and other permissions
+//  (tag update, timestamp updated, ...)
 
 if (isset($_GET['sync_metadata']))
 {
@@ -245,6 +236,7 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
     }
   }
 
+  // FIXME: why mass_updates here ? Used with a simple array?
   mass_updates(
     IMAGES_TABLE,
     array(
@@ -270,36 +262,45 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
 // +-----------------------------------------------------------------------+
 // associate the element to other categories than its storage category
 //
+
+// SUB-ACTION => associate_image_to_gallery
+
 if (isset($_POST['associate'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_dissociated'])
-    and count($_POST['cat_dissociated']) > 0
+    and (count($_POST['cat_dissociated']) > 0)
   )
 {
-  associate_images_to_categories(
-    array($_GET['image_id']),
-    array_intersect($_POST['cat_dissociated'], $my_categories)
-    );
+  $_categories = array_intersect($_POST['cat_dissociated'],
+                    icy_acl_get_categories("associate_image_to"));
+  //! $_categories = array_filter($_categories,
+  //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
+
+  associate_images_to_categories(array($_GET['image_id']), $_categories);
   invalidate_user_cache();
 }
 
+// SUB-ACTION => dissociate_image_from_gallery
 
 // dissociate the element from categories (but not from its storage category)
 if (isset($_POST['dissociate'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_associated'])
     and count($_POST['cat_associated']) > 0
   )
 {
-  $arr_dissociate = array_intersect($_POST['cat_associated'], $my_categories);
+
+  $_categories = array_intersect($_POST['cat_associated'],
+                    icy_acl_get_categories("associate_image_to"));
+  //! $_categories = array_filter($_categories,
+  //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
+
   $query = '
 DELETE FROM '.IMAGE_CATEGORY_TABLE.'
   WHERE image_id = '.$_GET['image_id'].'
-    AND category_id IN ('.implode(',', $arr_dissociate).')
+    AND category_id IN (0'.join(',', $_categories).')
 ';
-  pwg_query($query);
 
-  update_category($arr_dissociate);
+  pwg_query($query);
+  update_category($_categories);
   invalidate_user_cache();
 }
 
@@ -307,15 +308,18 @@ DELETE FROM '.IMAGE_CATEGORY_TABLE.'
 // |                              representation                           |
 // +-----------------------------------------------------------------------+
 
-// select the element to represent the given categories
+// SUB-ACTION => select the element to represent the given categories
+// FIXME: select or elect?
+
 if (isset($_POST['elect'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_dismissed'])
     and count($_POST['cat_dismissed']) > 0
   )
 {
   $datas = array();
-  $arr_dimissed = array_intersect($_POST['cat_dismissed'], $my_categories);
+  $arr_dimissed = array_intersect($_POST['cat_dismissed'],
+                        icy_acl_get_categories("present_image_to"));
+
   if (count($arr_dimissed) > 0)
   {
     foreach ($arr_dimissed as $category_id)
@@ -331,14 +335,15 @@ if (isset($_POST['elect'])
   }
 }
 
-// dismiss the element as representant of the given categories
+// SUB-ACTION => dismiss the element as representant of the given categories
+
 if (isset($_POST['dismiss'])
-    and ($has_plugin_community == true)
     and isset($_POST['cat_elected'])
     and count($_POST['cat_elected']) > 0
   )
 {
-  $arr_dismiss = array_intersect($_POST['cat_elected'], $my_categories);
+  $arr_dismiss = array_intersect($_POST['cat_elected'],
+                        icy_acl_get_categories("present_image_to"));
   if (count($arr_dismiss) > 0)
   {
     set_random_representant($arr_dismiss);
@@ -349,6 +354,8 @@ if (isset($_POST['dismiss'])
 // +-----------------------------------------------------------------------+
 // |                             tagging support                           |
 // +-----------------------------------------------------------------------+
+
+// FIXME: tag is always updatable?
 
 if (version_compare(PHPWG_VERSION, '2.2.5', '<')) {
   $q_tag_selection = "tag_id, name AS tag_name";
@@ -576,15 +583,16 @@ if (isset($url_img))
   $template->assign( 'U_JUMPTO', $url_img );
 }
 
-// associate to another category ?
+$_categories = icy_acl_get_categories("associate_image_to");
+// Select list of categories this image is associcated to
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
     INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
   WHERE image_id = '.$_GET['image_id'] . '
-    AND id IN ('. join(",", $my_categories).')';
-// if the image belongs to a physical storage,
-// we simply ignore that storage album
+    AND id IN (0'.join(",",$_categories).')';
+// FIMXE: if the image belongs to a physical storage,
+// FIXME: we simply ignore that storage album
 if (isset($storage_category_id))
 {
   $query.= '
@@ -604,27 +612,28 @@ while ($row = pwg_db_fetch_assoc($result))
 {
   array_push($associateds, $row['id']);
 }
+  // FIXME: Also display some forbidden presentations
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE id NOT IN ('.implode(',', $associateds).')
-  AND id IN ('. join(",", $my_categories).')
+  AND id IN (0'.join(",", $_categories).')
 ;';
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 
 // display list of categories for representing
+$_categories = icy_acl_get_categories("present_image_to");
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
   WHERE representative_picture_id = '.$_GET['image_id'].'
-    AND id IN ('. join(",", $my_categories).')
+    AND id IN (0'. join(",", $_categories).')
 ;';
 display_select_cat_wrapper($query, array(), 'elected_options');
-
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
-  WHERE id IN ('. join(",", $my_categories).')
+  WHERE id IN (0'. join(",", $_categories).')
     AND (representative_picture_id != '.$_GET['image_id'].'
     OR representative_picture_id IS NULL)
 ;';
