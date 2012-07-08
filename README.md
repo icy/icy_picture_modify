@@ -23,12 +23,10 @@
 # USAGE
 
   * Install and enable this plugin and the plugin `community`.
-
   * Create and edit ACL file in `local/config/icy_acl.zml` in your Piwigo
     installation. A sample file can be found in `doc/icy_acl.zml.sample`.
     You don't have to modify any settings for the plugin `community`.
     Moverover, any settings of the plugin `community` will be ignored.
-
   * If you are using a development of the plugin, please clean up the
     obsolete files (See `OBSOLETE FILES` below.)
 
@@ -48,15 +46,11 @@
 # KNOWN PROBLEMS
 
   * No webUI for ACL editting
-
   * If an image is replaced by other version (using plugin `Photo update`)
     the author of (new) image will be owned by administrator, not the
     current user. Hence the image won't be editable anymore.
-
   * This plugin doesn't support all known templates
-
   * This plugin may not work smoothly without the plugin 'community'
-
   * User can delete an image which is associated to some albums to which
     the user doesn't have permission to write/access. This is true as the
     plugin only checks owner of the image.

@@ -1,9 +1,9 @@
-## PURPOSE
+# PURPOSE
 
-  This file describes the advance ACL for Piwigo installation.
-  This file is supported by the plugin `icy_picture_modify`.
+  This format is used to describe advance ACL for Piwigo installation.
+  This ACL is supported by the plugin `icy_picture_modify`.
 
-## FORMAT
+# FORMAT
 
   Format details
 
@@ -11,10 +11,9 @@
   * Version:  1.0.0
   * Author:   icy (Anh K. Huynh)
 
-  # SYNTAX
+# SYNTAX
 
   There are only three types of lines
-
   * user name specification   _(meanful)_
   * variable assigment        _(meanful)_
   * all other non-sense lines _(meanless)_
@@ -32,9 +31,9 @@
   `reference` user has't any settings at the time it is declared,
   the reference will be ignored.
 
-  * Note 1: The special name `default` is used specially by the format,
+  * *Note 1:* The special name `default` is used specially by the format,
     and you should not use it for any user in your Piwigo system.
-  * Note 2: User name must not contain a colon (:)
+  * *Note 2:* User name must not contain a colon (:)
 
 ## Variable assigment
 
@@ -54,17 +53,18 @@
     whose its delimiter is any space, semi-colon (`;`), colon (`:`)
     or colon (`,`), or any combination of them. Each item of array
     is often a number, a user name, `sub` or `any` or `owner`.
-    # number:     specify category identity
-    # user name:  specify any Piwigo user name
-    # `sub`:      action can work on sub categories
-    # `any`:      action can work on any categories
-    # `owner`:    action can work on any image of current user
+
+    * number:     specify category identity
+    * user name:  specify any Piwigo user name
+    * `sub`:      action can work on sub categories
+    * `any`:      action can work on any categories
+    * `owner`:    action can work on any image of current user
 
 ## Meanless lines
 
   Any other lines are considered as comment. They are meanless.
 
-  # PARSER
+# PARSER
 
   Simple parser can be found in the function `icy_zml_parser` in
   ```
@@ -72,7 +72,7 @@
       functions_icy_picture_modify.inc.php
   ```
 
-  # EXAMPLE
+# EXAMPLE
 
 ## Default settings
 
