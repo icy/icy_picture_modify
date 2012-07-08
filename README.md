@@ -18,7 +18,7 @@
   (author, date, tags, description, metada, linking/represented categories).
   They can upload some images to some categories.
 
-  Advanced ACL allow users to work with any set of images / categories.
+  Advanced ACL allows users to work with any set of images / categories.
 
 # USAGE
 
