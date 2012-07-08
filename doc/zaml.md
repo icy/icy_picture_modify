@@ -14,6 +14,7 @@
 # SYNTAX
 
   There are only three types of lines
+
   * user name specification   _(meanful)_
   * variable assigment        _(meanful)_
   * all other non-sense lines _(meanless)_
@@ -79,16 +80,17 @@
   Default settings for all users (except guest user). These settings are
   put in the code of the plugin `icy_picture_modify` so you may not have
   to specify them. All of the following lines mean:
-  #  User can edit their own images (image they uploaded)
-  #  User can't delete any image
-  #  User can upload image to sub categories. Unfortunately, there is no
-  #  category specified, so they can't upload images to any category.
-  #  All images are showed on the Piwigo system after they are uploaded;
-  #  they will not require any moderation work
-  #  User can create new gallery inside sub categories. As there isn't
-  #  any category specified, they can't create any new gallery.
-  #  User can't link an image to any album
-  #  User can't create representation for any album
+
+  *  User can edit their own images (image they uploaded)
+  *  User can't delete any image
+  *  User can upload image to sub categories. Unfortunately, there is no
+  *  category specified, so they can't upload images to any category.
+  *  All images are showed on the Piwigo system after they are uploaded;
+  *  they will not require any moderation work
+  *  User can create new gallery inside sub categories. As there isn't
+  *  any category specified, they can't create any new gallery.
+  *  User can't link an image to any album
+  *  User can't create representation for any album
 
   ```
   default:
