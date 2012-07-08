@@ -1,6 +1,6 @@
 # NAME
 
-    `icy_picture_modify` -- Allow user to modify any pictures
+  `icy_picture_modify` -- Allow user to modify any pictures
 
 # DESCRIPTION
 
