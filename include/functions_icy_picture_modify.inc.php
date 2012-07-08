@@ -181,31 +181,28 @@ function icy_acl_get_categories($symbol) {
 
   $symbol_settings = icy_acl_get_data($symbol);
 
-  // If $symbol_settings is an array
-  //
-  if (is_array($symbol_settings)) {
-    if (icy_acl_symbol_data_wide_open($symbol_settings)) {
-      return TRUE;
-    }
-    elseif (preg_match("/_(to|from)$/", $symbol)) {
-      return in_array($guestdata, $symbol_settings);
-    }
-    elseif (preg_match("/_of$/", $symbol)) {
-      $guestowner = icy_get_username_of($guestowner);
-      // Replace 'owner' by the $guestowner. For example
-      //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
-      array_walk($symbol_settings,
-       create_function('&$val, $key',
-         'if ($val == "owner") {$val = "'.$user['username'].'";}'));
-      return in_array($guestowner, $symbol_settings);
-    }
-    else {
-      # FIXME: why?
-      return FALSE;
-    }
-  }
-  else {
+
+  if (! preg_match("/_(to|from|of)$/", $symbol)) {
     return is_bool($symbol_settings) ? $symbol_settings: FALSE;
+  }
+
+  if (! is_array($symbol_settings) ) {
+    return FALSE;
+  } elseif (icy_acl_symbol_data_wide_open($symbol_settings)) {
+    return TRUE;
+  }
+
+  if (preg_match("/_(to|from)$/", $symbol)) {
+    return in_array($guestdata, $symbol_settings);
+  }
+  elseif (preg_match("/_of$/", $symbol)) {
+    $guestowner = icy_get_username_of($guestowner);
+    // Replace 'owner' by the $guestowner. For example
+    //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
+    array_walk($symbol_settings,
+     create_function('&$val, $key',
+       'if ($val == "owner") {$val = "'.$user['username'].'";}'));
+    return in_array($guestowner, $symbol_settings);
   }
 }
 
