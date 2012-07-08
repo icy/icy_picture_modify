@@ -173,7 +173,8 @@ SELECT category_id
 // This includes other sub-actions and other permissions
 //  (tag update, timestamp updated, ...)
 
-if (isset($_GET['sync_metadata']))
+if (version_compare(PHPWG_VERSION, '2.4.0', '<')
+    and isset($_GET['sync_metadata']))
 {
   $query = '
 SELECT path
@@ -416,8 +417,6 @@ $template->assign(
     'ICY_ROOT_PATH' => realpath(dirname(PHPWG_PLUGINS_PATH)),
     'tag_selection' => $tag_selection,
     'tags' => $tags,
-    'U_SYNC' => $admin_url_start.'&amp;sync_metadata=1',
-    'U_DELETE' => $admin_url_start.'&amp;delete=1&amp;pwg_token='.get_pwg_token(),
 
     'PATH'=>$row['path'],
 
@@ -442,12 +441,23 @@ $template->assign(
     'DESCRIPTION' =>
       htmlspecialchars( isset($_POST['description']) ?
         stripslashes($_POST['description']) : @$row['comment'] ),
-
-    'F_ACTION' =>
-        get_root_url() # .'index.php?/icy_picture_modify'
-        .get_query_string_diff(array('sync_metadata'))
     )
   );
+
+if (version_compare(PHPWG_VERSION, '2.4.0', '<')) {
+  $template->assign(
+    array(
+      'U_SYNC' => $admin_url_start.'&amp;sync_metadata=1',
+      'F_ACTION' => get_root_url() . get_query_string_diff(array('sync_metadata'))
+    )
+  );
+}
+
+if (icy_image_deletable($_GET['image_id'])) {
+  $template->assign(
+    'U_DELETE', $admin_url_start.'&amp;delete=1&amp;pwg_token='.get_pwg_token()
+  );
+}
 
 if (array_key_exists('has_high', $row) and $row['has_high'] == 'true')
 {

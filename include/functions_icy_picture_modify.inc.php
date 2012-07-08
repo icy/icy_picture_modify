@@ -63,9 +63,13 @@ SELECT COUNT(id)
  * @author    icy
  */
 function icy_image_editable($image_id) {
-  $editable = icy_acl("edit_image_of", $image_id, icy_get_user_owner_of_image($image_id));
-  return $editable;
+  return icy_acl("edit_image_of", $image_id, icy_get_user_owner_of_image($image_id));
 }
+
+function icy_image_deletable($image_id) {
+  return icy_acl("delete_image_of", $image_id, icy_get_user_owner_of_image($image_id));
+}
+
 
 /*
  * Return list of visible/uploadable categories

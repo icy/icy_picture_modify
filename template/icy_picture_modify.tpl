@@ -46,9 +46,12 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
   <li><a href="{$U_JUMPTO}" title="{'jump to photo'|@translate}"><img src="{$ICY_PICTURE_MODIFY_PATH}/template/icon/category_jump-to.png" class="button" alt="{'jump to photo'|@translate}"></a></li>
   {/if}
   {if !url_is_remote($PATH)}
+  {if isset($U_SYNC) }
   <li><a href="{$U_SYNC}" title="{'synchronize'|@translate}"><img src="{$ICY_PICTURE_MODIFY_PATH}/template/icon/sync_metadata.png" class="button" alt="{'synchronize'|@translate}"></a></li>
-
+  {/if}
+  {if isset($U_IMAGE_DELETABLE) }
   <li><a href="{$U_DELETE}" title="{'delete photo'|@translate}"><img src="{$ICY_PICTURE_MODIFY_PATH}/template/icon/category_delete.png" class="button" alt="{'delete photo'|@translate}" onclick="return confirm('{'Are you sure?'|@translate|@escape:javascript}');"></a></li>
+  {/if}
   {/if}
 </ul>
 
