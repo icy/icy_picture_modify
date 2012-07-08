@@ -73,8 +73,11 @@
 
 # AUTHOR
 
-  Anh K. Huỳnh, email: kyanh@viettug.org,
-                nickname on Piwigo's forum: icy
+  The author's information
+
+  * Real name: Anh K. Huỳnh
+  * Email: kyanh@viettug.org, xkyanh@gmail.com
+  * Nickname on Piwigo's forum: icy
 
 # LICENSE
 
