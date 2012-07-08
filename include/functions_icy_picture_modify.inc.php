@@ -341,7 +341,7 @@ function icy_acl_load_configuration($force = FALSE) {
   if (($force == FALSE)
       and isset($ICY_ACL['default'])
       and isset($_SESSION['icy_picture_modify_acl_mtime'])
-      and ($_SESSION['icy_picture_modify_acl_mtime'] != filemtime($conf_path))) {
+      and ($_SESSION['icy_picture_modify_acl_mtime'] == filemtime($conf_path))) {
     #! icy_log("icy_acl_load_configuration: configuration is up-to-date");
     return FALSE;
   }
