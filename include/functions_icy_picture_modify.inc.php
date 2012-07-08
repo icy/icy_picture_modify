@@ -369,7 +369,7 @@ EOF
 
 /*
  * Return array of variable from a `.zml` array  / string
- * Syntax of the `.zml` file can be found in `doc/zml.txt`
+ * Syntax of the `.zml` file can be found in `doc/zaml.md`
  * @author icy
  */
 function icy_zml_parser($data) {
