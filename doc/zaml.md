@@ -13,13 +13,12 @@
 
 # SYNTAX
 
-  There are only three types of lines
+  There are only three types of lines in the format. They follows
+  a rule: a late one overwrites any similar mean of the previous lines.
 
   * user name specification   _(meanful)_
   * variable assigment        _(meanful)_
   * all other non-sense lines _(meanless)_
-
-  A late line will overwrite any similar mean of the previous lines.
 
 ## User name specification
 
