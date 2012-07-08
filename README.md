@@ -46,11 +46,11 @@
 # KNOWN PROBLEMS
 
   * No webUI for ACL editting
-  * If an image is replaced by other version (using plugin `Photo update`)
-    the author of (new) image will be owned by administrator, not the
-    current user. Hence the image won't be editable anymore.
+  * If an image is replaced by a new version (using plugin `Photo update`)
+    the new version is owned by administrator, not the current user.
+    Hence the image may not be editable by themself.
   * This plugin doesn't support all known templates
-  * This plugin may not work smoothly without the plugin 'community'
+  * This plugin may not work smoothly without the plugin `community`.
   * User can delete an image which is associated to some albums to which
     the user doesn't have permission to write/access. This is true as the
     plugin only checks owner of the image.
@@ -69,7 +69,7 @@
 # DONATION
 
   If you know what `donation` is and how it works in Open source develoment,
-  feel free to donate. My Paypal email is `xkyanh@gmail.com`.
+  feel free to donate ;) My Paypal email is `xkyanh@gmail.com`.
 
 # AUTHOR
 
