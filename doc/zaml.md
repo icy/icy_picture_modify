@@ -91,16 +91,16 @@
   *  User can't link an image to any album
   *  User can't create representation for any album
 
-  ```
-  default:
-    edit_image_of: owner
-    delete_image_of:
-    upload_image_to: sub
-    moderate_image: no
-    create_gallery_to: sub
-    associate_image_to:
-    present_image_to:
-  ```
+```
+default:
+  edit_image_of: owner
+  delete_image_of:
+  upload_image_to: sub
+  moderate_image: no
+  create_gallery_to: sub
+  associate_image_to:
+  present_image_to:
+```
 
 ## A normal user
 
@@ -111,22 +111,22 @@
   category; He can also make representation for any album
   Finally, he can't delete any images.
 
-  ```
-  example_user1:
-    upload_image_to: sub, 34
-    edit_image_of:  example_user0, owner
-    associate_image_to: any
-    create_gallery_to: 34, sub
-    present_image_to: any
-    delete_image_of:
-  ```
+```
+example_user1:
+  upload_image_to: sub, 34
+  edit_image_of:  example_user0, owner
+  associate_image_to: any
+  create_gallery_to: 34, sub
+  present_image_to: any
+  delete_image_of:
+```
 
 ## Reference
 
   This user `example_user2` will have all settings of `example_user1`,
   except he can delete images of `example_user1` and his own
 
-  ```
-  example_user2: @example_user1
-    delete_image_of: owner, example_user1
-  ```
+```
+example_user2: @example_user1
+  delete_image_of: owner, example_user1
+```
