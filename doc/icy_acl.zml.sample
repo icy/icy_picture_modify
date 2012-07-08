@@ -1,0 +1,43 @@
+# Default settings for all users (except guest user). These settings are
+# put in the code of the plugin `icy_picture_modify` so you may not have
+# to specify them. All of the following lines mean:
+#   - User can edit their own images (image they uploaded)
+#   - User can't delete any image
+#   - User can upload image to sub categories. Unfortunately, there is no
+#     category specified, so they can't upload images to any category.
+#   - All images are showed on the Piwigo system after they are uploaded;
+#     they will not require any moderation work
+#   - User can create new gallery inside sub categories. As there isn't
+#     any category specified, they can't create any new gallery.
+#   - User can't link an image to any album
+#   - User can't create representation for any album
+
+default:
+  edit_image_of: owner
+  delete_image_of:
+  upload_image_to: sub
+  moderate_image: no
+  create_gallery_to: sub
+  associate_image_to:
+  present_image_to:
+
+# This user can upload image to category whose identity is `34`;
+# He can edit image of his own and of the user `example_user0`;
+# He can link images to any album in Piwigo system;
+# He can create new gallery in the parent category `34` and its sub
+# category; He can also make representation for any album
+# Finally, he can't delete any images.
+
+example_user1:
+  upload_image_to: sub, 34
+  edit_image_of:  example_user0, owner
+  associate_image_to: any
+  create_gallery_to: 34, sub
+  present_image_to: any
+  delete_image_of:
+
+# This user `example_user2` will have all settings of `example_user1`,
+# except he can delete images of `example_user1` and his own
+
+example_user2: @example_user1
+  delete_image_of: owner, example_user1
