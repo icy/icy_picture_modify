@@ -81,7 +81,7 @@ function icy_acl_get_value($symbol) {
  * @symbol Any kind of symbol (A variable name in ACL)
  * @author icy
  */
-function icy_acl_get_real_values($symbol) {
+function icy_acl_get_real_value($symbol) {
   global $user, $conf;
 
   $all_categories = array();
@@ -164,7 +164,7 @@ function icy_acl_get_real_values($symbol) {
     return TRUE;
   }
 
-  $symbol_data = icy_acl_get_real_values($symbol);
+  $symbol_data = icy_acl_get_real_value($symbol);
 
   if (! preg_match("/_(to|from|of)$/", $symbol)) {
     return is_bool($symbol_data) ? $symbol_data: FALSE;
@@ -453,8 +453,8 @@ function icy_acl_fix_community($force = FALSE) {
 
   $return['upload_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("upload_image_to"));
   $return['create_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("create_gallery_to"));
-  $return['upload_categories'] = icy_acl_get_real_values("upload_image_to");
-  $return['create_categories'] = icy_acl_get_real_values("create_gallery_to");
+  $return['upload_categories'] = icy_acl_get_real_value("upload_image_to");
+  $return['create_categories'] = icy_acl_get_real_value("create_gallery_to");
   $return['permission_ids'] = array();
   $return['icy_acl_fixed'] = 1;
 
