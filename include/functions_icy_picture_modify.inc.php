@@ -455,9 +455,9 @@ function icy_acl_fix_community($force = FALSE) {
     );
 
   $return['upload_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("upload_image_to"));
-  $return['create_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("create_image_to"));
+  $return['create_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("create_gallery_to"));
   $return['upload_categories'] = icy_acl_get_real_value("upload_image_to");
-  $return['create_categories'] = icy_acl_get_real_value("create_image_to");
+  $return['create_categories'] = icy_acl_get_real_value("create_gallery_to");
   $return['permission_ids'] = array();
   $return['icy_acl_fixed'] = 1;
 
