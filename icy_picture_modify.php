@@ -86,6 +86,7 @@ if (isset($_SESSION['page_infos']))
 }
 
 // <find writable categories>
+// FIXME: Why is this needed?
 $my_categories = array_from_query('SELECT category_id FROM '
                         .IMAGE_CATEGORY_TABLE.';', 'category_id');
 
@@ -252,11 +253,11 @@ if (isset($_POST['associate'])
 {
   $_categories = array_intersect($_POST['cat_dissociated'],
                     icy_acl_get_real_value("associate_image_to"));
-  //! $_categories = array_filter($_categories,
-  //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
 
-  associate_images_to_categories(array($_GET['image_id']), $_categories);
-  invalidate_user_cache();
+  if (! empty($_categories) ) {
+    associate_images_to_categories(array($_GET['image_id']), $_categories);
+    invalidate_user_cache();
+  }
 }
 
 // SUB-ACTION => dissociate_image_from_gallery
@@ -270,18 +271,17 @@ if (isset($_POST['dissociate'])
 
   $_categories = array_intersect($_POST['cat_associated'],
                     icy_acl_get_real_value("associate_image_to"));
-  //! $_categories = array_filter($_categories,
-  //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
 
-  $query = '
-DELETE FROM '.IMAGE_CATEGORY_TABLE.'
-  WHERE image_id = '.$_GET['image_id'].'
-    AND category_id IN (0'.join(',', $_categories).')
-';
+  if (! empty($_categories) ) {
+    $query = '
+      DELETE FROM '.IMAGE_CATEGORY_TABLE.'
+        WHERE image_id = '.$_GET['image_id'].'
+        AND category_id IN (0'.join(',', $_categories).')';
 
-  pwg_query($query);
-  update_category($_categories);
-  invalidate_user_cache();
+    pwg_query($query);
+    update_category($_categories);
+    invalidate_user_cache();
+  }
 }
 
 // +-----------------------------------------------------------------------+
