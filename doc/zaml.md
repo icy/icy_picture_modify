@@ -17,7 +17,7 @@
   a rule: a late one overwrites any similar mean of the previous lines.
 
   * user name specification   _(meanful)_
-  * variable assigment        _(meanful)_
+  * variable assignment       _(meanful)_
   * all other non-sense lines _(meanless)_
 
 ## User name specification
@@ -35,9 +35,9 @@
     and you should not use it for any user in your Piwigo system.
   * *Note 2:* User name must not contain a colon (:)
 
-## Variable assigment
+## Variable assignment
 
-  A variable assigment has two parts: a variable name and its value.
+  A variable assignment has two parts: a variable name and its value.
   On the line, the variable name must be started by two spaces,
   followed by a colon (:) and its value.
 
