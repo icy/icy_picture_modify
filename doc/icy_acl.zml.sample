@@ -25,7 +25,7 @@ default:
 # He can edit image of his own and of the user `example_user0`;
 # He can link images to any album in Piwigo system;
 # He can create new gallery in the parent category `34` and its sub
-# category; He can also make representation for any album
+# category; He can't make representation for any album
 # Finally, he can't delete any images.
 
 example_user1:
@@ -33,7 +33,7 @@ example_user1:
   edit_image_of:  example_user0, owner
   associate_image_to: any
   create_gallery_to: 34, sub
-  present_image_to: any
+  present_image_to: no
   delete_image_of:
 
 # This user `example_user2` will have all settings of `example_user1`,
