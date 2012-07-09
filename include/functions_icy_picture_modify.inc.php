@@ -422,13 +422,13 @@ function icy_zml_parser($data) {
  * Overwrite the ACl setings from community plugin
  * @author icy
  * @force  Force the Community's ACL to be updated
- * @return TRUE
+ * @return (NONE)
  */
 function icy_acl_fix_community($force = FALSE) {
   global $user, $_SESSION;
 
   if (!icy_plugin_enabled("community")) {
-    return TRUE;
+    return;
   }
 
   require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
@@ -443,7 +443,7 @@ function icy_acl_fix_community($force = FALSE) {
       and isset($_SESSION['community_user_permissions'])
       and isset($_SESSION['community_user_permissions']['icy_acl_fixed'])) {
     #! icy_log("icy_fix_community_acl: the fix is up-to-date " . print_r($_SESSION['community_user_permissions'], true));
-    return TRUE;
+    return;
   }
 
   # icy_log("WARNING: icy_fix_community_acl: the fix is out-of-date. will fix it again");
@@ -465,8 +465,6 @@ function icy_acl_fix_community($force = FALSE) {
   $_SESSION['community_user_permissions'] = $return;
   $_SESSION['community_cache_key'] = $cache_key;
   $_SESSION['community_user_id'] = $user['id'];
-
-  return TRUE;
 }
 
 
