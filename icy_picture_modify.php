@@ -443,12 +443,12 @@ if (icy_acl("delete_image_of", $_GET['image_id'])) {
 }
 
 # If there are some categories to present image to
-if (! empty(icy_acl_get_real_values("present_image_to"))) {
+if (count(icy_acl_get_real_values("present_image_to"))) {
   $template->assign('U_PRESENT_IMAGE', 1);
 }
 
 # If there are some categories to associate image to
-if (! empty(icy_acl_get_real_values("associate_image_to"))) {
+if (count(icy_acl_get_real_values("associate_image_to"))) {
   $template->assign('U_LINKING_IMAGE', 1);
 }
 
