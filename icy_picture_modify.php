@@ -432,7 +432,6 @@ if (version_compare(PHPWG_VERSION, '2.4.0', '<')) {
   );
 }
 
-icy_log("user can delete image ?" . $_GET['image_id']. " => " . icy_acl("delete_image_of", $_GET['image_id']));
 if (icy_acl("delete_image_of", $_GET['image_id'])) {
   $template->assign(
     'U_DELETE', $admin_url_start.'&amp;delete=1&amp;pwg_token='.get_pwg_token()
