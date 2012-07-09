@@ -79,6 +79,14 @@
   * Email: kyanh@viettug.org, xkyanh@gmail.com
   * Nickname on Piwigo's forum: icy
 
+# THANKS
+
+  Special thanks to
+
+  * plg     _(Piwigo forum)_
+  * delakut _(Piwigo forum)_
+  * IGraham _(Piwigo forum)_
+
 # LICENSE
 
   GPL2
