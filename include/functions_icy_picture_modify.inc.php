@@ -108,7 +108,7 @@ function icy_acl_get_real_value($symbol) {
 
   # Type A: _of, will return list of authors
 
-  if (!preg_match("/_of$/", $symbol)) {
+  if (preg_match("/_of$/", $symbol)) {
     if (in_array('owner', $symbol_settings)) {
       array_walk($symbol_settings,
         create_function('&$val, $key',
@@ -147,6 +147,8 @@ function icy_acl_get_real_value($symbol) {
   }
 
   $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
+
+  var_dump($symbol_categories);
 
   return array_values($symbol_categories);
 }
@@ -454,13 +456,10 @@ function icy_acl_fix_community($force = FALSE) {
     'permission_ids' => array(),
     );
 
-  $upload_image_to = icy_acl_get_value("upload_image_to");
-  $create_gallery_to = icy_acl_get_value("create_gallery_to");
-
-  $return['upload_whole_gallery'] = icy_acl_is_value_open($upload_image_to);
-  $return['create_whole_gallery'] = icy_acl_is_value_open($create_gallery_to);
-  $return['upload_categories'] = $upload_image_to;
-  $return['create_categories'] = $create_gallery_to;
+  $return['upload_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("upload_image_to"));
+  $return['create_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("create_image_to"));
+  $return['upload_categories'] = icy_acl_get_real_value("upload_image_to");
+  $return['create_categories'] = icy_acl_get_real_value("create_image_to");
   $return['permission_ids'] = array();
   $return['icy_acl_fixed'] = 1;
 
