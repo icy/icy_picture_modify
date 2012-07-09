@@ -422,44 +422,47 @@ function icy_zml_parser($data) {
  * Overwrite the ACl setings from community plugin
  * @author icy
  * @force  Force the Community's ACL to be updated
- * @return (NONE)
+ * @return TRUE
  */
 function icy_acl_fix_community($force = FALSE) {
   global $user, $_SESSION;
 
-  if (icy_plugin_enabled("community")) {
-    require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
-
-    $cache_key = community_get_cache_key();
-    if (!isset($cache_key))  {
-      $cache_key = community_update_cache_key();
-    }
-
-    if (($force == FALSE)
-        and isset($_SESSION['community_user_permissions'])
-        and isset($_SESSION['community_user_permissions']['icy_acl_fixed']))
-    {
-      # Do nothing
-    }
-    else {
-      $return = array(
-        'create_categories' => array(),
-        'upload_categories' => array(),
-        'permission_ids' => array(),
-        );
-
-      $return['upload_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("upload_image_to"));
-      $return['create_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("create_gallery_to"));
-      $return['upload_categories'] = icy_acl_get_real_values("upload_image_to");
-      $return['create_categories'] = icy_acl_get_real_values("create_gallery_to");
-      $return['permission_ids'] = array();
-      $return['icy_acl_fixed'] = 1;
-
-      $_SESSION['community_user_permissions'] = $return;
-      $_SESSION['community_cache_key'] = $cache_key;
-      $_SESSION['community_user_id'] = $user['id'];
-    }
+  if (!icy_plugin_enabled("community")) {
+    return TRUE;
   }
+
+  require_once(PHPWG_PLUGINS_PATH.'community/include/functions_community.inc.php');
+
+  $cache_key = community_get_cache_key();
+  if (!isset($cache_key))  {
+    $cache_key = community_update_cache_key();
+  }
+
+  if (($force == FALSE)
+      and isset($_SESSION['community_user_permissions'])
+      and isset($_SESSION['community_user_permissions']['icy_acl_fixed']))
+  {
+    return TRUE;
+  }
+
+  $return = array(
+    'create_categories' => array(),
+    'upload_categories' => array(),
+    'permission_ids' => array(),
+    );
+
+  $return['upload_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("upload_image_to"));
+  $return['create_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("create_gallery_to"));
+  $return['upload_categories'] = icy_acl_get_real_values("upload_image_to");
+  $return['create_categories'] = icy_acl_get_real_values("create_gallery_to");
+  $return['permission_ids'] = array();
+  $return['icy_acl_fixed'] = 1;
+
+  $_SESSION['community_user_permissions'] = $return;
+  $_SESSION['community_cache_key'] = $cache_key;
+  $_SESSION['community_user_id'] = $user['id'];
+
+  return TRUE;
 }
 
 if (!function_exists('array_replace')) {
