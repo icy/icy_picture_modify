@@ -148,8 +148,6 @@ function icy_acl_get_real_value($symbol) {
 
   $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
 
-  var_dump($symbol_categories);
-
   return array_values($symbol_categories);
 }
 
