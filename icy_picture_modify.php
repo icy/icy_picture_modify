@@ -255,7 +255,7 @@ if (isset($_POST['associate'])
   )
 {
   $_categories = array_intersect($_POST['cat_dissociated'],
-                    icy_acl_get_categories("associate_image_to"));
+                    icy_acl_get_real_values("associate_image_to"));
   //! $_categories = array_filter($_categories,
   //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
 
@@ -273,7 +273,7 @@ if (isset($_POST['dissociate'])
 {
 
   $_categories = array_intersect($_POST['cat_associated'],
-                    icy_acl_get_categories("associate_image_to"));
+                    icy_acl_get_real_values("associate_image_to"));
   //! $_categories = array_filter($_categories,
   //!    create_function('$item', 'return icy_acl("associate_image_to", $item);'));
 
@@ -302,7 +302,7 @@ if (isset($_POST['elect'])
 {
   $datas = array();
   $arr_dimissed = array_intersect($_POST['cat_dismissed'],
-                        icy_acl_get_categories("present_image_to"));
+                        icy_acl_get_real_values("present_image_to"));
 
   if (count($arr_dimissed) > 0)
   {
@@ -327,7 +327,7 @@ if (isset($_POST['dismiss'])
   )
 {
   $arr_dismiss = array_intersect($_POST['cat_elected'],
-                        icy_acl_get_categories("present_image_to"));
+                        icy_acl_get_real_values("present_image_to"));
   if (count($arr_dismiss) > 0)
   {
     set_random_representant($arr_dismiss);
@@ -442,11 +442,13 @@ if (icy_acl("delete_image_of", $_GET['image_id'])) {
   );
 }
 
-if (icy_acl("present_image_to")) {
+# If there are some categories to present image to
+if (! empty(icy_acl_get_real_values("present_image_to"))) {
   $template->assign('U_PRESENT_IMAGE', 1);
 }
 
-if (icy_acl("associate_image_to")) {
+# If there are some categories to associate image to
+if (! empty(icy_acl_get_real_values("associate_image_to"))) {
   $template->assign('U_LINKING_IMAGE', 1);
 }
 
@@ -584,7 +586,7 @@ if (isset($url_img))
   $template->assign( 'U_JUMPTO', $url_img );
 }
 
-$_categories = icy_acl_get_categories("associate_image_to");
+$_categories = icy_acl_get_real_values("associate_image_to");
 // Select list of categories this image is associcated to
 $query = '
 SELECT id,name,uppercats,global_rank
@@ -623,7 +625,7 @@ SELECT id,name,uppercats,global_rank
 display_select_cat_wrapper($query, array(), 'dissociated_options');
 
 // display list of categories for representing
-$_categories = icy_acl_get_categories("present_image_to");
+$_categories = icy_acl_get_real_values("present_image_to");
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'

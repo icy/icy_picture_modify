@@ -1,7 +1,7 @@
 <?php
 /*
- * Purpose: Provide functions for ACL
- * Author : Piwigo, icy
+ * Purpose: Provide functions for ICY ACL
+ * Author : icy (Anh K. Huynh)
  * License: GPL2
  * Note   : The source is based on the `picture_modify.php` in Piwigo
  */
@@ -21,8 +21,9 @@ function icy_check_image_owner($image_id)
 
 /*
  * Check if an image does exist
- * @return bool
- * @author icy
+ * @return    bool
+ * @image_id  a valid identity of the image
+ * @author    icy
  *
 */
 function icy_image_exists($image_id)
@@ -41,10 +42,12 @@ SELECT COUNT(id)
 }
 
 /*
- * Return list of visible/uploadable categories
- * @author  icy
+ * Return value of a variable in ACL
+ * @return An array, NULL or a Boolean value (See ZAML format)
+ * @symbol A variable name in ACL
+ * @author icy
  */
-function icy_acl_get_data($symbol) {
+function icy_acl_get_value($symbol) {
   global $user, $ICY_ACL;
 
   // Load ACL setting for this user
@@ -63,11 +66,14 @@ function icy_acl_get_data($symbol) {
 }
 
 /*
- *
- * visible: upload, assosiate,...
- * @symbol    must be ended by "_to" or "_from"
+ * Get real values from a value of a symbol in ACL
+ * @note   Currently support `_from|_to` only
+ * @TODO   Support `_of` form
+ * @return Array of categories
+ * @symbol Any kind of symbol (A variable name in ACL)
+ * @author icy
  */
-function icy_acl_get_categories($symbol) {
+function icy_acl_get_real_values($symbol) {
   global $user, $conf;
 
   $all_categories = array();
@@ -76,17 +82,18 @@ function icy_acl_get_categories($symbol) {
 
   // It's always EMPTY array for any kind of guests
   if ($user['id'] == $conf['guest_id']) {
-    return $symbol_categories;
+    return array();
   }
 
   // check if $symbol is valid
   if (!preg_match("/_(to|from)$/", $symbol)) {
-    return $symbol_categories;
+    return array();
   }
 
-  $symbol_settings = icy_acl_get_data($symbol);
-  if (!$symbol_settings) {
-    return $symbol_categories;
+  // This is only a trick to speed up
+  $symbol_settings = icy_acl_get_value($symbol);
+  if (empty($symbol_settings)) {
+    return array();
   }
 
   // all known categories in the system
@@ -96,7 +103,7 @@ function icy_acl_get_categories($symbol) {
 
   // ICY_ACL allows user to access all categories. In this case,
   // the plugin 'community' plays an empty role (we just supress it)
-  if (icy_acl_symbol_data_wide_open($symbol_settings)) {
+  if (icy_acl_is_value_open($symbol_settings)) {
     $symbol_categories = $all_categories;
   }
   elseif (is_array($symbol_settings)) {
@@ -109,35 +116,30 @@ function icy_acl_get_categories($symbol) {
 
   // Make sure categories are in our sytem
   // remove all forbidden categories from the list
-  if (in_array('sub', icy_acl_get_data($symbol))) {
+  if (in_array('sub', icy_acl_get_value($symbol))) {
     // FIXME: (get_subcat_ids) requires a 0-based array
     // FIXME: + array(0) is really a trick :) In Piwigo 2.4, (get_subcat_ids)
     // FIXME: will generate NOTICE (SQL syntax error) if $symbol_categories is empty.
     $symbol_categories = array_merge($symbol_categories, get_subcat_ids($symbol_categories + array(0)));
   }
   $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
+
   return array_values($symbol_categories);
 }
+
 /*
- * FIXME: Test if current user is logged in
- * FIXME: $guestowner must be provided explicitly
- *
  * Check if the current user has permission to do something
+ *
  * @symbol     Action to be checked
- * @guestdata  Object of the action
- * @guestowner Owner of @guestdata
+ * @guestdata  Object of the action ($image_id, $category_id)
+ * @return     Boolean
  *
  * There are two cases of @symbol:
- * - _from/_to: action on an category
- * - _of      : action on the author
- * - others   : boolean flag
+ * - _from/_to: action on a $category_id
+ * - _of      : action on a $image_id
+ * - others   : boolean flag, $guestdata is not used
  *
- * There are three cases of symbol data
- * - Array of categories (' identities)    [_from/_to]
- *    $guestowner is simply ignored
- * - Array of usernames (list of authors)  [_of]
- *    $guestowner must be specified
- * - Others: {"any", "owner", TRUE, FALSE} [others]
+ * FIXME: Need to use real values instead !!!
  */
  function icy_acl($symbol, $guestdata = NULL) {
   global $user, $ICY_ACL, $conf;
@@ -152,8 +154,7 @@ function icy_acl_get_categories($symbol) {
     return TRUE;
   }
 
-  $symbol_settings = icy_acl_get_data($symbol);
-
+  $symbol_settings = icy_acl_get_value($symbol);
 
   if (! preg_match("/_(to|from|of)$/", $symbol)) {
     return is_bool($symbol_settings) ? $symbol_settings: FALSE;
@@ -161,10 +162,11 @@ function icy_acl_get_categories($symbol) {
 
   if (! is_array($symbol_settings) ) {
     return FALSE;
-  } elseif (icy_acl_symbol_data_wide_open($symbol_settings)) {
+  } elseif (icy_acl_is_value_open($symbol_settings)) {
     return TRUE;
   }
 
+  # If there are not settings for this symbol
   if (empty($symbol_settings)) {
     return FALSE;
   }
@@ -182,11 +184,12 @@ function icy_acl_get_categories($symbol) {
     array_walk($symbol_settings,
      create_function('&$val, $key',
        'if ($val == "owner") {$val = "'.$user['username'].'";}'));
+
     return in_array($guestowner, $symbol_settings);
   }
 }
 
-function icy_acl_symbol_data_wide_open($symbol_data) {
+function icy_acl_is_value_open($symbol_data) {
   return (is_array($symbol_data) and in_array("any", $symbol_data));
 }
 
@@ -309,7 +312,9 @@ SELECT count(id)
 
 /*
  * Load ICY_ACL configuration from files
- * @author   icy
+ * @author icy
+ * @force  Force the new configuration to be loaded from file
+ * @return TRUE if new configuration is loaded. FALSE otherwise
  */
 function icy_acl_load_configuration($force = FALSE) {
   global $ICY_ACL;
@@ -348,6 +353,7 @@ EOF
  * Return array of variable from a `.zml` array  / string
  * Syntax of the `.zml` file can be found in `doc/zaml.md`
  * @author icy
+ * @return An array of ACL
  */
 function icy_zml_parser($data) {
   $acl = array();
@@ -404,7 +410,9 @@ function icy_zml_parser($data) {
 
 /*
  * Overwrite the ACl setings from community plugin
- * @author: icy
+ * @author icy
+ * @force  Force the Community's ACL to be updated
+ * @return TRUE
  */
 function icy_acl_fix_community($force = FALSE) {
   global $user, $_SESSION;
@@ -437,20 +445,26 @@ function icy_acl_fix_community($force = FALSE) {
     'permission_ids' => array(),
     );
 
-  $return['upload_whole_gallery'] = icy_acl_symbol_data_wide_open(icy_acl_get_data("upload_image_to"));
-  $return['create_whole_gallery'] = icy_acl_symbol_data_wide_open(icy_acl_get_data("create_gallery_to"));
-  $return['upload_categories'] = icy_acl_get_categories("upload_image_to");
-  $return['create_categories'] = icy_acl_get_categories("create_gallery_to");
+  $return['upload_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("upload_image_to"));
+  $return['create_whole_gallery'] = icy_acl_is_value_open(icy_acl_get_value("create_gallery_to"));
+  $return['upload_categories'] = icy_acl_get_real_values("upload_image_to");
+  $return['create_categories'] = icy_acl_get_real_values("create_gallery_to");
   $return['permission_ids'] = array();
   $return['icy_acl_fixed'] = 1;
 
   $_SESSION['community_user_permissions'] = $return;
   $_SESSION['community_cache_key'] = $cache_key;
   $_SESSION['community_user_id'] = $user['id'];
+
+  return TRUE;
 }
 
 
 if (!function_exists('array_replace')) {
+  /*
+   * Replace items in an array with items in another array
+   * @return An array
+   */
   function array_replace() {
     $array=array();
     $n=func_num_args();
