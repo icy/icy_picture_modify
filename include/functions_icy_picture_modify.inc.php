@@ -185,9 +185,9 @@ function icy_acl_get_real_values($symbol) {
     return in_array($guestdata, $symbol_data);
   }
   elseif (preg_match("/_of$/", $symbol)) {
+    # FIXME: move these stuff to icy_get_real_values;
     # In this case, $guestdata should be an $image_id
-    $guest_id = icy_get_user_id_of_image($guestdata);
-    $guestowner = icy_get_username_of($guest_id);
+    $guestowner = icy_get_username_of(icy_get_user_id_of_image($guestdata));
     // Replace 'owner' by the $guestowner. For example
     //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
     // FIXME: should we fix the ACL in-advance
