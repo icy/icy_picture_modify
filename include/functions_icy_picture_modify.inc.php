@@ -77,7 +77,7 @@ function icy_acl_get_value($symbol) {
  * @note   Currently support `_from|_to` only
  * @TODO   Support `_of` form
  *
- * @return Array of categories
+ * @return Array of categories or authors
  * @symbol Any kind of symbol (A variable name in ACL)
  * @author icy
  */
@@ -96,7 +96,7 @@ function icy_acl_get_real_value($symbol) {
   // check if $symbol is valid. There are two kinds of variable that
   // can return a list of categories: _to and _from. Any other variable
   // with use the value in ACL setting.
-  if (!preg_match("/_(to|from)$/", $symbol)) {
+  if (!preg_match("/_(to|from|of)$/", $symbol)) {
     return icy_acl_get_value($symbol);
   }
 
@@ -105,6 +105,19 @@ function icy_acl_get_real_value($symbol) {
   if (empty($symbol_settings)) {
     return array();
   }
+
+  # Type A: _of, will return list of authors
+
+  if (!preg_match("/_of$/", $symbol)) {
+    if (in_array('owner', $symbol_settings)) {
+      array_walk($symbol_settings,
+        create_function('&$val, $key',
+        'if ($val == "owner") {$val = "'.$user['username'].'";}'));
+    }
+    return $symbol_settings;
+  }
+
+  # Type B: _to/_from, will return list of categories
 
   // all known categories in the system
   $query = 'SELECT id FROM '.CATEGORIES_TABLE.';';
@@ -132,6 +145,7 @@ function icy_acl_get_real_value($symbol) {
     // FIXME: will generate NOTICE (SQL syntax error) if $symbol_categories is empty.
     $symbol_categories = array_merge($symbol_categories, get_subcat_ids($symbol_categories + array(0)));
   }
+
   $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
 
   return array_values($symbol_categories);
@@ -181,22 +195,11 @@ function icy_acl_get_real_value($symbol) {
     return FALSE;
   }
 
-  if (preg_match("/_(to|from)$/", $symbol)) {
-    return in_array($guestdata, $symbol_data);
+  if (preg_match("/_of$/", $symbol)) {
+    $guestdata = icy_get_username_of(icy_get_user_id_of_image($guestdata));
   }
-  elseif (preg_match("/_of$/", $symbol)) {
-    # FIXME: move these stuff to icy_get_real_values;
-    # In this case, $guestdata should be an $image_id
-    $guestowner = icy_get_username_of(icy_get_user_id_of_image($guestdata));
-    // Replace 'owner' by the $guestowner. For example
-    //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
-    // FIXME: should we fix the ACL in-advance
-    array_walk($symbol_data,
-     create_function('&$val, $key',
-       'if ($val == "owner") {$val = "'.$user['username'].'";}'));
 
-    return in_array($guestowner, $symbol_data);
-  }
+  return in_array($guestdata, $symbol_data);
 }
 
 function icy_acl_is_value_open($symbol_data) {
