@@ -42,7 +42,11 @@ SELECT COUNT(id)
 }
 
 /*
- * Return value of a variable in ACL
+ * Return value of a variable in ACL. The value may contain some special
+ * item (sub, any, owner), so they should be adapted by other methods.
+ * In general, the value says there are something in the ACL, but it
+ * doesn't say the user has permission on some object.
+ *
  * @return An array, NULL or a Boolean value (See ZAML format)
  * @symbol A variable name in ACL
  * @author icy
@@ -66,9 +70,13 @@ function icy_acl_get_value($symbol) {
 }
 
 /*
- * Get real values from a value of a symbol in ACL
+ * Get real values from a value of a symbol in ACL. The purpose
+ * of this function is to analyze the value of a symbol, and replace
+ * any of special value (sub, owner, ...) but real values
+ *
  * @note   Currently support `_from|_to` only
  * @TODO   Support `_of` form
+ *
  * @return Array of categories
  * @symbol Any kind of symbol (A variable name in ACL)
  * @author icy
@@ -85,9 +93,11 @@ function icy_acl_get_real_values($symbol) {
     return array();
   }
 
-  // check if $symbol is valid
+  // check if $symbol is valid. There are two kinds of variable that
+  // can return a list of categories: _to and _from. Any other variable
+  // with use the value in ACL setting.
   if (!preg_match("/_(to|from)$/", $symbol)) {
-    return array();
+    return icy_acl_get_value($symbol);
   }
 
   // This is only a trick to speed up
@@ -111,12 +121,12 @@ function icy_acl_get_real_values($symbol) {
   }
   else {
     // not wide-open, not an-array. So waht!?
-    $symbol_settings = array();
+    return array();
   }
 
   // Make sure categories are in our sytem
   // remove all forbidden categories from the list
-  if (in_array('sub', icy_acl_get_value($symbol))) {
+  if (in_array('sub', $symbol_settings)) {
     // FIXME: (get_subcat_ids) requires a 0-based array
     // FIXME: + array(0) is really a trick :) In Piwigo 2.4, (get_subcat_ids)
     // FIXME: will generate NOTICE (SQL syntax error) if $symbol_categories is empty.
@@ -154,25 +164,25 @@ function icy_acl_get_real_values($symbol) {
     return TRUE;
   }
 
-  $symbol_settings = icy_acl_get_value($symbol);
+  $symbol_data = icy_acl_get_real_values($symbol);
 
   if (! preg_match("/_(to|from|of)$/", $symbol)) {
-    return is_bool($symbol_settings) ? $symbol_settings: FALSE;
+    return is_bool($symbol_data) ? $symbol_data: FALSE;
   }
 
-  if (! is_array($symbol_settings) ) {
+  if (! is_array($symbol_data) ) {
     return FALSE;
-  } elseif (icy_acl_is_value_open($symbol_settings)) {
+  } elseif (icy_acl_is_value_open($symbol_data)) {
     return TRUE;
   }
 
   # If there are not settings for this symbol
-  if (empty($symbol_settings)) {
+  if (empty($symbol_data)) {
     return FALSE;
   }
 
   if (preg_match("/_(to|from)$/", $symbol)) {
-    return in_array($guestdata, $symbol_settings);
+    return in_array($guestdata, $symbol_data);
   }
   elseif (preg_match("/_of$/", $symbol)) {
     # In this case, $guestdata should be an $image_id
@@ -181,11 +191,11 @@ function icy_acl_get_real_values($symbol) {
     // Replace 'owner' by the $guestowner. For example
     //  array('owner','ruby', 12) => array($guestowner, 'ruby', 12)
     // FIXME: should we fix the ACL in-advance
-    array_walk($symbol_settings,
+    array_walk($symbol_data,
      create_function('&$val, $key',
        'if ($val == "owner") {$val = "'.$user['username'].'";}'));
 
-    return in_array($guestowner, $symbol_settings);
+    return in_array($guestowner, $symbol_data);
   }
 }
 
