@@ -187,6 +187,7 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
 
 </form>
 
+{if isset($U_LINKING_IMAGE)}
 <form id="associations" method="post" action="{$F_ACTION}#associations">
   <fieldset>
     <legend>{'Linked albums'|@translate}</legend>
@@ -213,7 +214,9 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
 
   </fieldset>
 </form>
+{/if}
 
+{if isset($U_PRESENT_IMAGE)}
 <form id="representation" method="post" action="{$F_ACTION}#representation">
   <fieldset>
     <legend>{'Representation of albums'|@translate}</legend>
@@ -240,3 +243,4 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
 
   </fieldset>
 </form>
+{/if}

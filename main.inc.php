@@ -2,10 +2,11 @@
 /*
 Plugin Name: Icy Modify Picture
 Version: 2.0.0
-Description: Allow users to modify pictures they uploaded
+Description: Allow normal users to upload / modify pictures
 Plugin URI: http://piwigo.org/ext/extension_view.php?eid=563
 Author: icy
 Author URI: http://metakyanh.sarovar.org/
+License: GPL2
 */
 
 if (!defined('PHPWG_ROOT_PATH'))
@@ -79,7 +80,7 @@ function icy_picture_modify_loc_begin_picture()
 
   icy_acl_load_configuration();
 
-  if (icy_image_editable($page['image_id']))
+  if (icy_acl("edit_image_of",$page['image_id']))
   {
     $url_admin =
       get_root_url().'index.php?/icy_picture_modify'

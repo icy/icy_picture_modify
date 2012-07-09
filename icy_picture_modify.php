@@ -1,25 +1,10 @@
 <?php
-// +-----------------------------------------------------------------------+
-// | Piwigo - a PHP based photo gallery                                    |
-// +-----------------------------------------------------------------------+
-// | Copyright(C) 2008-2011 Piwigo Team                  http://piwigo.org |
-// | Copyright(C) 2003-2008 PhpWebGallery Team    http://phpwebgallery.net |
-// | Copyright(C) 2002-2003 Pierrick LE GALL   http://le-gall.net/pierrick |
-// +-----------------------------------------------------------------------+
-// | This program is free software; you can redistribute it and/or modify  |
-// | it under the terms of the GNU General Public License as published by  |
-// | the Free Software Foundation                                          |
-// |                                                                       |
-// | This program is distributed in the hope that it will be useful, but   |
-// | WITHOUT ANY WARRANTY; without even the implied warranty of            |
-// | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |
-// | General Public License for more details.                              |
-// |                                                                       |
-// | You should have received a copy of the GNU General Public License     |
-// | along with this program; if not, write to the Free Software           |
-// | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, |
-// | USA.                                                                  |
-// +-----------------------------------------------------------------------+
+/*
+ * Purpose: Main actions (modify, delete, update pictures)
+ * Author : Piwigo, icy
+ * License: GPL2
+ * Note   : The source is based on the `picture_modify.php` in Piwigo
+ */
 
 if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
 if (!defined('ICY_PICTURE_MODIFY_PATH')) die('Hacking attempt!');
@@ -82,7 +67,7 @@ check_input_parameter('cat_id', $_GET, false, PATTERN_ID);
 check_input_parameter('image_id', $_GET, false, PATTERN_ID);
 
 // Return if the image isn't editable
-if (!icy_acl("edit_image_of", $_GET['image_id'], icy_get_user_owner_of_image($_GET['image_id'])))
+if (!icy_acl("edit_image_of", $_GET['image_id'], icy_get_user_id_of_image($_GET['image_id'])))
 {
   $url = make_picture_url(
       array(
@@ -115,9 +100,7 @@ $my_categories = array_from_query('SELECT category_id FROM '
 // ACTION => :delete_image
 
 if (isset($_GET['delete'])
-      and icy_acl("delete_image_of",
-            $_GET['image_id'],
-            icy_get_user_owner_of_image($_GET['image_id'])))
+      and icy_acl("delete_image_of", $_GET['image_id']))
 {
   check_pwg_token();
 
@@ -453,10 +436,18 @@ if (version_compare(PHPWG_VERSION, '2.4.0', '<')) {
   );
 }
 
-if (icy_image_deletable($_GET['image_id'])) {
+if (icy_acl("delete_image_of", $_GET['image_id'])) {
   $template->assign(
     'U_DELETE', $admin_url_start.'&amp;delete=1&amp;pwg_token='.get_pwg_token()
   );
+}
+
+if (icy_acl("present_image_to")) {
+  $template->assign('U_PRESENT_IMAGE', 1);
+}
+
+if (icy_acl("associate_image_to")) {
+  $template->assign('U_LINKING_IMAGE', 1);
 }
 
 if (array_key_exists('has_high', $row) and $row['has_high'] == 'true')
