@@ -153,16 +153,21 @@ SELECT category_id
 // This includes other sub-actions and other permissions
 //  (tag update, timestamp updated, ...)
 
-if (version_compare(PHPWG_VERSION, '2.4.0', '<')
-    and isset($_GET['sync_metadata']))
+if (isset($_GET['sync_metadata']))
 {
   $query = '
 SELECT path
   FROM '.IMAGES_TABLE.'
   WHERE id = '.$_GET['image_id'].'
 ;';
-  list($path) = pwg_db_fetch_row(pwg_query($query));
-  update_metadata(array($_GET['image_id'] => $path));
+
+  if(version_compare(PHPWG_VERSION, '2.4.0', '<')) {
+    list($path) = pwg_db_fetch_row(pwg_query($query));
+    update_metadata(array($_GET['image_id'] => $path));
+  }
+  else {
+    sync_metadata(array( intval($_GET['image_id'])));
+  }
 
   array_push($page['infos'], l10n('Metadata synchronized from file'));
 }
@@ -423,14 +428,12 @@ $template->assign(
     )
   );
 
-if (version_compare(PHPWG_VERSION, '2.4.0', '<')) {
-  $template->assign(
-    array(
-      'U_SYNC' => $admin_url_start.'&amp;sync_metadata=1',
-      'F_ACTION' => get_root_url() . get_query_string_diff(array('sync_metadata'))
-    )
-  );
-}
+$template->assign(
+  array(
+    'U_SYNC' => $admin_url_start.'&amp;sync_metadata=1',
+    'F_ACTION' => get_root_url() . get_query_string_diff(array('sync_metadata'))
+  )
+);
 
 if (icy_acl("delete_image_of", $_GET['image_id'])) {
   $template->assign(
