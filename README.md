@@ -71,7 +71,7 @@
 ## DONATION
 
   If you know what `donation` is and how it works in Open source develoment,
-  feel free to donate ;) My Paypal email is `xkyanh@gmail.com`.
+  feel free to donate ;) My Paypal email is xkyanh@gmail.com.
 
 ## AUTHOR
 
