@@ -7,19 +7,6 @@
  */
 
 /*
- * Check if the current image is editable by the current user. The input
- * data $image_id and $user_id must be validated befored being used here.
- * @return bool
- * @author icy
- *
-*/
-function icy_check_image_owner($image_id)
-{
-  global $user;
-  return $user['id'] == icy_get_user_id_of_image($image_id);
-}
-
-/*
  * Check if an image does exist
  * @return    bool
  * @image_id  a valid identity of the image
