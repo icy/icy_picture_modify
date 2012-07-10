@@ -17,7 +17,7 @@ if (is_admin())
 {
   if (icy_image_exists($_GET['image_id']))
   {
-    if (version_compare(PHPWG_VERSION, '2.4.0', '<') {
+    if (version_compare(PHPWG_VERSION, '2.4.0', '<')) {
       $url = get_root_url().'admin.php?page=picture_modify';
     }
     else {
