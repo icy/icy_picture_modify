@@ -17,7 +17,13 @@ if (is_admin())
 {
   if (icy_image_exists($_GET['image_id']))
   {
-    $url = get_root_url().'admin.php?page=picture_modify';
+    if (version_compare(PHPWG_VERSION, '2.4.0', '<') {
+      $url = get_root_url().'admin.php?page=picture_modify';
+    }
+    else {
+      $url = get_root_url().'admin.php?page=photo';
+    }
+
     $url.= '&amp;image_id='.$_GET['image_id'];
     $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
     // FIXME: What happens if a POST data were sent within admin uid?
