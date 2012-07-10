@@ -190,7 +190,9 @@ function icy_acl_get_real_value($symbol) {
 }
 
 function icy_acl_is_value_open($symbol_data) {
-  return (is_array($symbol_data) and in_array("any", $symbol_data));
+  return is_admin()
+    or (is_array($symbol_data)
+        and in_array("any", $symbol_data));
 }
 
 /*
