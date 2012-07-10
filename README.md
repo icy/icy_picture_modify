@@ -50,7 +50,7 @@
     the new version is owned by administrator, not the current user.
     Hence the image may not be editable by themself.
   * This plugin doesn't support all known templates. If you are using
-    `stripped` or `stripped-galleria`, you may following the instructions
+    `stripped` or `stripped-galleria`, you may follow the instructions
     in this forum post
         http://piwigo.org/forum/viewtopic.php?pid=132380#p132380
   * User can delete an image which is associated to some albums to which
