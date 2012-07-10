@@ -64,11 +64,12 @@ function icy_picture_modify_index()
 
   if ($page['section'] == 'icy_picture_modify')
   {
-    include(ICY_PICTURE_MODIFY_PATH.'icy_picture_modify.php');
+    require(ICY_PICTURE_MODIFY_PATH.'icy_picture_modify.php');
   }
   elseif ($page['section'] == 'add_photos') {
+    # FIXME: remove the following line
     icy_picture_modify_fix_community_acl(TRUE);
-    include(ICY_PICTURE_MODIFY_PATH.'add_photos.php');
+    require(ICY_PICTURE_MODIFY_PATH.'add_photos.php');
   }
 }
 
