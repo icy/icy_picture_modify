@@ -75,7 +75,6 @@ function icy_picture_modify_index()
 }
 
 // provide the link to modify the picture
-// FIXME: Why use $page['image_id'] instead of $_GET['image_id']
 function icy_picture_modify_loc_begin_picture()
 {
   global $conf, $template, $page, $user;
@@ -85,15 +84,15 @@ function icy_picture_modify_loc_begin_picture()
   if (icy_acl("edit_image_of",$page['image_id']))
   {
     $url_admin =
-      get_root_url().'index.php?/icy_picture_modify'
-      .'&amp;cat_id='.(isset($page['category']) ? $page['category']['id'] : '')
-      .'&amp;image_id='.$page['image_id'];
+      get_root_url().'index.php?/icy_picture_modify&amp;'.'image_id='.$page['image_id'];
 
-    $template->assign(
-      array(
-        'U_ADMIN' => $url_admin,
-        )
-      );
+    if (isset($page['category'])
+        and isset($page['category']['id'])
+          and ! empty($page['category']['id']))
+    {
+      $url_admin .= '&amp;cat_id='.$page['category']['id'];
+    }
+    $template->assign('U_ADMIN', $url_admin);
   }
 }
 

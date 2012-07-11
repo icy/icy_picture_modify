@@ -25,8 +25,10 @@ if (is_admin())
     }
 
     $url.= $_GET['image_id'];
-    $url.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
-    // FIXME: What happens if a POST data were sent within admin uid?
+
+    if (isset($_GET['cat_id']) and ! empty($_GET['cat_id'])) {
+      $url .=  '&amp;cat_id='.$_GET['cat_id'];
+    }
     redirect_http($url);
   }
   else
