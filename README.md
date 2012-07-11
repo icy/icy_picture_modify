@@ -98,4 +98,4 @@
   * At Github.com:  https://github.com/icy/icy_picture_modify
   * At Piwigo.com:  http://piwigo.org/ext/extension_view.php?eid=563
   * SVN repository: http://piwigo.org/svn/extensions/Icy_Picture_Modify/
-  * Forum link:     http://piwigo.org/forum/viewtopic.php?pid=131585#p131585
+  * Forum link:     http://piwigo.org/forum/viewtopic.php?id=17745
