@@ -61,9 +61,6 @@ function icy_acl_get_value($symbol) {
  * of this function is to analyze the value of a symbol, and replace
  * any of special value (sub, owner, ...) but real values
  *
- * @note   Currently support `_from|_to` only
- * @TODO   Support `_of` form
- *
  * @return Array of categories or authors
  * @symbol Any kind of symbol (A variable name in ACL)
  * @author icy
