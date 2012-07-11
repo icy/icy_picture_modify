@@ -15,7 +15,17 @@
 
 {* Heavily copied from Piwigo distribution: picture_modify.tpl *}
 
+{combine_script id='jquery.chosen.z' load='footer' path="$ICY_PICTURE_MODIFY_PATH/template/chosen.min.js"}
+{combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'chosen.css'}
+
+{footer_script}{literal}
+jQuery(document).ready(function() {
+  jQuery(".chzn-select").chosen();
+});
+{/literal}{/footer_script}
+
 {combine_script id='jquery.tokeninput' load='async' require='jquery' path='themes/default/js/plugins/jquery.tokeninput.js'}
+
 {footer_script require='jquery.tokeninput'}
 jQuery(document).ready(function() {ldelim}
   jQuery("#tags").tokenInput(
@@ -30,6 +40,20 @@ jQuery(document).ready(function() {ldelim}
       allowCreation: true
     }
   );
+{if isset($U_LINKING_IMAGE)}
+  jQuery("#tags").tokenInput(
+    [{foreach from=$tags item=tag name=tags}{ldelim}"name":"{$tag.name|@escape:'javascript'}","id":"{$tag.id}"{rdelim}{if !$smarty.foreach.tags.last},{/if}{/foreach}],
+    {ldelim}
+      hintText: '{'Type in a search term'|@translate}',
+      noResultsText: '{'No results'|@translate}',
+      searchingText: '{'Searching...'|@translate}',
+      newText: ' ({'new'|@translate})',
+      animateDropdown: false,
+      preventDuplicates: true,
+      allowCreation: true
+    }
+  );
+{/if}
 });
 {/footer_script}
 
@@ -176,71 +200,31 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
     </td>
   </tr>
 
-    </table>
+   </table>
+  </fieldset>
+
+{if isset($U_LINKING_IMAGE)}
+  <fieldset>
+    <legend>{'Linked albums'|@translate}</legend>
+    <select data-placeholder="Select albums..." class="chzn-select" multiple style="width:700px;" name="cat_associate[]">
+      {html_options options=$associate_options selected=$associate_options_selected}
+    </select>
+  </fieldset>
+{/if}
+
+{if isset($U_PRESENT_IMAGE)}
+  <fieldset>
+    <legend>{'Representation of albums'|@translate}</legend>
+    <select data-placeholder="Select albums..." class="chzn-select" multiple style="width:700px;" name="cat_elected[]">
+      {html_options options=$represent_options selected=$represent_options_selected}
+    </select>
+  </fieldset>
+{/if}
+
 
     <p style="text-align:center;">
       <input class="submit" type="submit" value="{'Submit'|@translate}" name="submit">
       <input class="submit" type="reset" value="{'Reset'|@translate}" name="reset">
     </p>
 
-  </fieldset>
-
 </form>
-
-{if isset($U_LINKING_IMAGE)}
-<form id="associations" method="post" action="{$F_ACTION}#associations">
-  <fieldset>
-    <legend>{'Linked albums'|@translate}</legend>
-
-    <table class="doubleSelect">
-      <tr>
-        <td>
-          <h3>{'Associated'|@translate}</h3>
-          <select class="categoryList" name="cat_associated[]" multiple="multiple" size="30">
-            {html_options options=$associated_options}
-          </select>
-          <p><input class="submit" type="submit" value="&raquo;" name="dissociate" style="font-size:15px;"></p>
-        </td>
-
-        <td>
-          <h3>{'Dissociated'|@translate}</h3>
-          <select class="categoryList" name="cat_dissociated[]" multiple="multiple" size="30">
-            {html_options options=$dissociated_options}
-          </select>
-          <p><input class="submit" type="submit" value="&laquo;" name="associate" style="font-size:15px;"></p>
-        </td>
-      </tr>
-    </table>
-
-  </fieldset>
-</form>
-{/if}
-
-{if isset($U_PRESENT_IMAGE)}
-<form id="representation" method="post" action="{$F_ACTION}#representation">
-  <fieldset>
-    <legend>{'Representation of albums'|@translate}</legend>
-
-    <table class="doubleSelect">
-      <tr>
-        <td>
-          <h3>{'Represents'|@translate}</h3>
-          <select class="categoryList" name="cat_elected[]" multiple="multiple" size="30">
-            {html_options options=$elected_options}
-          </select>
-          <p><input class="submit" type="submit" value="&raquo;" name="dismiss" style="font-size:15px;"></p>
-        </td>
-
-        <td>
-          <h3>{'Does not represent'|@translate}</h3>
-          <select class="categoryList" name="cat_dismissed[]" multiple="multiple" size="30">
-            {html_options options=$dismissed_options}
-          </select>
-          <p><input class="submit" type="submit" value="&laquo;" name="elect" style="font-size:15px;"></p>
-        </td>
-      </tr>
-    </table>
-
-  </fieldset>
-</form>
-{/if}

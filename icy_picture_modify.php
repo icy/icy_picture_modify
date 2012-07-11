@@ -98,11 +98,9 @@ if (isset($_SESSION['page_infos']))
 $my_categories = array_from_query('SELECT category_id FROM '
                         .IMAGE_CATEGORY_TABLE.';', 'category_id');
 
-// +-----------------------------------------------------------------------+
-// |                             delete photo                              |
-// +-----------------------------------------------------------------------+
-
-// ACTION => :delete_image
+########################################################################
+# ACTION => :delete_image ##############################################
+########################################################################
 
 if (isset($_GET['delete'])
       and icy_acl("delete_image_of", $_GET['image_id']))
@@ -259,13 +257,22 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
 
 // SUB-ACTION => associate_image_to_gallery
 
-if (isset($_POST['associate'])
-    and isset($_POST['cat_dissociated'])
-    and (count($_POST['cat_dissociated']) > 0)
-  )
-{
-  $_categories = array_intersect($_POST['cat_dissociated'],
+if (isset($_POST['cat_associate'])) {
+
+  $_categories = array_intersect($_POST['cat_associate'],
                     icy_acl_get_real_value("associate_image_to"));
+
+  // let's first break links with all albums but their "storage album"
+  // copied from Piwigo 2.4
+  $query = '
+DELETE '.IMAGE_CATEGORY_TABLE.'.*
+  FROM '.IMAGE_CATEGORY_TABLE.'
+    JOIN '.IMAGES_TABLE.' ON image_id=id
+  WHERE image_id = '.$_GET['image_id'].'
+    AND (storage_category_id IS NULL OR storage_category_id != category_id)
+;';
+
+  pwg_query($query);
 
   if (! empty($_categories) ) {
     associate_images_to_categories(array($_GET['image_id']), $_categories);
@@ -275,28 +282,6 @@ if (isset($_POST['associate'])
 
 // SUB-ACTION => dissociate_image_from_gallery
 
-// dissociate the element from categories (but not from its storage category)
-if (isset($_POST['dissociate'])
-    and isset($_POST['cat_associated'])
-    and count($_POST['cat_associated']) > 0
-  )
-{
-
-  $_categories = array_intersect($_POST['cat_associated'],
-                    icy_acl_get_real_value("associate_image_to"));
-
-  if (! empty($_categories) ) {
-    $query = '
-      DELETE FROM '.IMAGE_CATEGORY_TABLE.'
-        WHERE image_id = '.$_GET['image_id'].'
-        AND category_id IN (0'.join(',', $_categories).')';
-
-    pwg_query($query);
-    update_category($_categories);
-    invalidate_user_cache();
-  }
-}
-
 // +-----------------------------------------------------------------------+
 // |                              representation                           |
 // +-----------------------------------------------------------------------+
@@ -304,19 +289,24 @@ if (isset($_POST['dissociate'])
 // SUB-ACTION => select the element to represent the given categories
 // FIXME: select or elect?
 
-if (isset($_POST['elect'])
-    and isset($_POST['cat_dismissed'])
-    and count($_POST['cat_dismissed']) > 0
-  )
+if (isset($_POST['cat_elected']))
 {
+  $_categories = icy_acl_get_real_value("present_image_to");
   $datas = array();
-  $arr_dimissed = array_intersect($_POST['cat_dismissed'],
-                        icy_acl_get_real_value("present_image_to"));
+  $update_cache = false;
 
-  if (count($arr_dimissed) > 0)
-  {
-    foreach ($arr_dimissed as $category_id)
-    {
+  # List of categories has this picture as thumbnail
+  $query = '
+  SELECT id
+    FROM '.CATEGORIES_TABLE.'
+    WHERE representative_picture_id = '.$_GET['image_id'].'
+  ;';
+  $represent_options_selected = array_intersect($_categories, array_from_query($query, 'id'));
+
+  # Make this pictures as thumbnail for $input_categories
+  $input_categories = array_intersect($_POST['cat_elected'], $_categories);
+  if (count($input_categories) > 0) {
+    foreach ($input_categories as $category_id) {
       array_push($datas,
                  array('id' => $category_id,
                        'representative_picture_id' => $_GET['image_id']));
@@ -324,22 +314,17 @@ if (isset($_POST['elect'])
     $fields = array('primary' => array('id'),
                     'update' => array('representative_picture_id'));
     mass_updates(CATEGORIES_TABLE, $fields, $datas);
-    invalidate_user_cache();
+    $update_cache = true;
   }
-}
 
-// SUB-ACTION => dismiss the element as representant of the given categories
+  # And set random thubnail for others
+  $random_thumbs = array_diff($represent_options_selected, $input_categories);
+  if (count($random_thumbs) > 0) {
+    set_random_representant($random_thumbs);
+    $update_cache = true;
+  }
 
-if (isset($_POST['dismiss'])
-    and isset($_POST['cat_elected'])
-    and count($_POST['cat_elected']) > 0
-  )
-{
-  $arr_dismiss = array_intersect($_POST['cat_elected'],
-                        icy_acl_get_real_value("present_image_to"));
-  if (count($arr_dismiss) > 0)
-  {
-    set_random_representant($arr_dismiss);
+  if ($update_cache) {
     invalidate_user_cache();
   }
 }
@@ -540,7 +525,10 @@ while ($row = pwg_db_fetch_assoc($result))
   }
 }
 
-// jump to link
+########################################################################
+# jump to link #########################################################
+########################################################################
+
 //
 // 1. find all linked categories that are reachable for the current user.
 // 2. if a category is available in the URL, use it if reachable
@@ -593,10 +581,14 @@ if (isset($url_img))
   $template->assign( 'U_JUMPTO', $url_img );
 }
 
+########################################################################
+## ASSOCIATION (LINKING IMAGE TO ANOTHER ALBUM) ########################
+########################################################################
+
 $_categories = icy_acl_get_real_value("associate_image_to");
-// Select list of categories this image is associcated to
+
 $query = '
-SELECT id,name,uppercats,global_rank
+SELECT id
   FROM '.CATEGORIES_TABLE.'
     INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
   WHERE image_id = '.$_GET['image_id'] . '
@@ -610,46 +602,44 @@ if (isset($storage_category_id))
 }
 $query.= '
 ;';
-display_select_cat_wrapper($query, array(), 'associated_options');
 
-$result = pwg_query($query);
-$associateds = array(-1);
-if (isset($storage_category_id))
-{
-  array_push($associateds, $storage_category_id);
+$selected_ones = array_from_query($query, 'id');
+if (isset($storage_category_id)) {
+  array_push($selected_ones, $storage_category_id);
 }
-while ($row = pwg_db_fetch_assoc($result))
-{
-  array_push($associateds, $row['id']);
-}
-  // FIXME: Also display some forbidden presentations
+
 $query = '
 SELECT id,name,uppercats,global_rank
   FROM '.CATEGORIES_TABLE.'
-  WHERE id NOT IN ('.implode(',', $associateds).')
-  AND id IN (0'.join(",", $_categories).')
-;';
-display_select_cat_wrapper($query, array(), 'dissociated_options');
+    WHERE id IN (0'.join(",",$_categories).')';
 
-// display list of categories for representing
+display_select_cat_wrapper($query, $selected_ones, 'associate_options');
+
+########################################################################
+# PRESENTATION (MAKE IMAGE AS THUMBNAIL FOR SOME ALBUMS) ###############
+########################################################################
+
 $_categories = icy_acl_get_real_value("present_image_to");
+
 $query = '
-SELECT id,name,uppercats,global_rank
-  FROM '.CATEGORIES_TABLE.'
-  WHERE representative_picture_id = '.$_GET['image_id'].'
-    AND id IN (0'. join(",", $_categories).')
-;';
-display_select_cat_wrapper($query, array(), 'elected_options');
-$query = '
-SELECT id,name,uppercats,global_rank
+SELECT id
   FROM '.CATEGORIES_TABLE.'
   WHERE id IN (0'. join(",", $_categories).')
-    AND (representative_picture_id != '.$_GET['image_id'].'
-    OR representative_picture_id IS NULL)
-;';
-display_select_cat_wrapper($query, array(), 'dismissed_options');
+    AND (representative_picture_id = '.$_GET['image_id'].');';
 
-//----------------------------------------------------------- sending html code
+$selected_ones = array_from_query($query, 'id');
+
+$query = '
+SELECT id,name,uppercats,global_rank
+  FROM '.CATEGORIES_TABLE.'
+    WHERE id IN (0'.join(",",$_categories).')';
+
+display_select_cat_wrapper($query, $selected_ones, 'represent_options');
+
+
+########################################################################
+# TEMPLATE: FINALIZING #################################################
+########################################################################
 
 $template->assign_var_from_handle('PLUGIN_INDEX_CONTENT_BEGIN', 'icy_picture_modify');
 
