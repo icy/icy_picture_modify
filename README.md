@@ -20,6 +20,8 @@
 
   Advanced ACL allows users to work with any set of images / categories.
 
+  This plugin can work on Piwigo 2.2.x, 2.3.x and 2.4.x.
+
 ## USAGE
 
   * Install and enable this plugin and the plugin `community`.

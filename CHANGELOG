@@ -1,3 +1,8 @@
+2.0.2 2012-07-11
+
+  - Fix various bugs
+  - Beautiful UI for image linking/association form
+
 2.0.1 2012-07-09
 
   - Advance ACL support in local ZAML file
