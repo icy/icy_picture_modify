@@ -1,7 +1,7 @@
 <?php
 /*
  * Purpose: Provide `upload` function, replace the function in the plugin
- *          `community`. Advance ACL support.
+ *          `community`. Advanced ACL support.
  * Author : Piwigo, plg, icy
  * License: GPL2
  * Note   : The source is based on the `picture_modify.php` in Piwigo

@@ -5,7 +5,7 @@
 
 2.0.1 2012-07-09
 
-  - Advance ACL support in local ZAML file
+  - Advanced ACL support in local ZAML file
   - Upload permission can be specified in new ACL
   - Doesn't require any settings from the plugin `community`
 
