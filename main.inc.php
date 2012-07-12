@@ -24,7 +24,6 @@ global $ICY_ACL;
 # Hooks declarations ###################################################
 
 add_event_handler('loc_end_section_init', 'icy_picture_modify_section_init');
-remove_event_handler('loc_end_index', 'community_index');
 add_event_handler('loc_end_index', 'icy_picture_modify_index', 40);
 
 add_event_handler('loc_begin_picture', 'icy_picture_modify_loc_begin_picture');
@@ -37,6 +36,7 @@ add_event_handler('ws_add_methods', 'icy_picture_modify_fix_community_acl', 40);
 add_event_handler('sendResponse', 'icy_picture_modify_fix_community_acl', 40);
 
 if (icy_plugin_enabled("community")) {
+  remove_event_handler('loc_end_index', 'community_index');
   add_event_handler('community_ws_categories_getList', 'icy_picture_modify_fix_community_acl', 40);
 }
 
