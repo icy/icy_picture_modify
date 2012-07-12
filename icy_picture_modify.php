@@ -434,16 +434,6 @@ if (icy_acl("delete_image_of", $_GET['image_id'])) {
   );
 }
 
-# If there are some categories to present image to
-if (count(icy_acl_get_real_value("present_image_to"))) {
-  $template->assign('U_PRESENT_IMAGE', 1);
-}
-
-# If there are some categories to associate image to
-if (count(icy_acl_get_real_value("associate_image_to"))) {
-  $template->assign('U_LINKING_IMAGE', 1);
-}
-
 if (array_key_exists('has_high', $row) and $row['has_high'] == 'true')
 {
   $template->assign(
@@ -587,33 +577,36 @@ if (isset($url_img))
 
 $_categories = icy_acl_get_real_value("associate_image_to");
 
-$query = '
-SELECT id
-  FROM '.CATEGORIES_TABLE.'
-    INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
-  WHERE image_id = '.$_GET['image_id'] . '
-    AND id IN (0'.join(",",$_categories).')';
-// FIMXE: if the image belongs to a physical storage,
-// FIXME: we simply ignore that storage album
-if (isset($storage_category_id))
-{
+if (count($_categories)) {
+  $template->assign('U_LINKING_IMAGE', 1);
+
+  $query = '
+  SELECT id
+    FROM '.CATEGORIES_TABLE.'
+      INNER JOIN '.IMAGE_CATEGORY_TABLE.' ON id = category_id
+    WHERE image_id = '.$_GET['image_id'] . '
+      AND id IN (0'.join(",",$_categories).')';
+
+  // FIMXE: if the image belongs to a physical storage,
+  // FIXME: we simply ignore that storage album
+  if (isset($storage_category_id)) {
+    $query.= ' AND id != '.$storage_category_id;
+  }
   $query.= '
-    AND id != '.$storage_category_id;
+  ;';
+
+  $selected_ones = array_from_query($query, 'id');
+  if (isset($storage_category_id)) {
+    array_push($selected_ones, $storage_category_id);
+  }
+
+  $query = '
+  SELECT id,name,uppercats,global_rank
+    FROM '.CATEGORIES_TABLE.'
+      WHERE id IN (0'.join(",",$_categories).')';
+
+  display_select_cat_wrapper($query, $selected_ones, 'associate_options');
 }
-$query.= '
-;';
-
-$selected_ones = array_from_query($query, 'id');
-if (isset($storage_category_id)) {
-  array_push($selected_ones, $storage_category_id);
-}
-
-$query = '
-SELECT id,name,uppercats,global_rank
-  FROM '.CATEGORIES_TABLE.'
-    WHERE id IN (0'.join(",",$_categories).')';
-
-display_select_cat_wrapper($query, $selected_ones, 'associate_options');
 
 ########################################################################
 # PRESENTATION (MAKE IMAGE AS THUMBNAIL FOR SOME ALBUMS) ###############
@@ -621,21 +614,24 @@ display_select_cat_wrapper($query, $selected_ones, 'associate_options');
 
 $_categories = icy_acl_get_real_value("present_image_to");
 
-$query = '
-SELECT id
-  FROM '.CATEGORIES_TABLE.'
-  WHERE id IN (0'. join(",", $_categories).')
-    AND (representative_picture_id = '.$_GET['image_id'].');';
+if (count($_categories) > 0) {
+  $template->assign('U_PRESENT_IMAGE', 1);
 
-$selected_ones = array_from_query($query, 'id');
+  $query = '
+  SELECT id
+    FROM '.CATEGORIES_TABLE.'
+    WHERE id IN (0'. join(",", $_categories).')
+      AND (representative_picture_id = '.$_GET['image_id'].');';
 
-$query = '
-SELECT id,name,uppercats,global_rank
-  FROM '.CATEGORIES_TABLE.'
-    WHERE id IN (0'.join(",",$_categories).')';
+  $selected_ones = array_from_query($query, 'id');
 
-display_select_cat_wrapper($query, $selected_ones, 'represent_options');
+  $query = '
+  SELECT id,name,uppercats,global_rank
+    FROM '.CATEGORIES_TABLE.'
+      WHERE id IN (0'.join(",",$_categories).')';
 
+  display_select_cat_wrapper($query, $selected_ones, 'represent_options');
+}
 
 ########################################################################
 # TEMPLATE: FINALIZING #################################################
