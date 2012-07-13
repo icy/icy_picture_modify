@@ -29,8 +29,8 @@
     installation. A sample file can be found in `doc/icy_acl.zml.sample`.
     You don't have to modify any settings for the plugin `community`.
     Moverover, any settings of the plugin `community` will be ignored.
-  * If you are using a development of the plugin, please clean up the
-    obsolete files (See `OBSOLETE FILES` below.)
+  * If you are using a development version of the plugin, please clean up
+    the obsolete files (See `OBSOLETE FILES` below.)
 
 ## OBSOLETE FILES
 
