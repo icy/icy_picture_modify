@@ -50,7 +50,7 @@
   * No webUI for ACL editting
   * If an image is replaced by a new version (using plugin `Photo update`)
     the new version is owned by administrator, not the current user.
-    Hence the image may not be editable by themself.
+    Hence the image may not be editable anymore.
   * This plugin doesn't support all known templates. If you are using
     `stripped` or `stripped-galleria`, you may follow the instructions
     in this forum post
