@@ -1,6 +1,6 @@
 # PURPOSE
 
-  This format is used to describe advance ACL for Piwigo installation.
+  This format is used to describe advanced ACL for Piwigo installation.
   This ACL is supported by the plugin `icy_picture_modify`.
 
 # FORMAT

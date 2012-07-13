@@ -298,15 +298,8 @@ SELECT count(id)
 ;';
 
   list($count) = pwg_db_fetch_row(pwg_query($query));
-  $return = ($count == 1 ? true : false);
 
-  // we need the file ^^
-  if ($plugin_name == "community")
-    $return = $return
-                and is_file(PHPWG_PLUGINS_PATH
-                  .'community/include/functions_community.inc.php');
-
-  return $return;
+  return ($count == 1 ? true : false);
 }
 
 /*

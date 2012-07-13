@@ -1,7 +1,7 @@
 <?php
 /*
  * Purpose: Provide `upload` function, replace the function in the plugin
- *          `community`. Advance ACL support.
+ *          `community`. Advanced ACL support.
  * Author : Piwigo, plg, icy
  * License: GPL2
  * Note   : The source is based on the `picture_modify.php` in Piwigo
@@ -120,7 +120,7 @@ if (isset($image_ids) and count($image_ids) > 0)
   // user is allowed to upload to events/parties with no admin moderation,
   // then he's not moderated when uploading in
   // events/parties/happyNewYear2011
-  $moderate = icy_acl("moderate_image");
+  $moderate = (icy_acl("moderate_image") and icy_plugin_enabled("community"));
   if ($moderate)
   {
     $inserts = array();
