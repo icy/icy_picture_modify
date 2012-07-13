@@ -40,20 +40,6 @@ jQuery(document).ready(function() {ldelim}
       allowCreation: true
     }
   );
-{if isset($U_LINKING_IMAGE)}
-  jQuery("#tags").tokenInput(
-    [{foreach from=$tags item=tag name=tags}{ldelim}"name":"{$tag.name|@escape:'javascript'}","id":"{$tag.id}"{rdelim}{if !$smarty.foreach.tags.last},{/if}{/foreach}],
-    {ldelim}
-      hintText: '{'Type in a search term'|@translate}',
-      noResultsText: '{'No results'|@translate}',
-      searchingText: '{'Searching...'|@translate}',
-      newText: ' ({'new'|@translate})',
-      animateDropdown: false,
-      preventDuplicates: true,
-      allowCreation: true
-    }
-  );
-{/if}
 });
 {/footer_script}
 
