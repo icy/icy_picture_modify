@@ -11,7 +11,7 @@
 {combine_css path= 'admin/themes/default/'|@cat:'theme.css'}
 {combine_css path= 'themes/default/js/ui/theme/'|@cat:'jquery.ui.datepicker.css'}
 {combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'datepicker.css'}
-{combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'ui-resizable.css'}
+{combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'icy_picture_modify.css'}
 
 {* Heavily copied from Piwigo distribution: picture_modify.tpl *}
 
