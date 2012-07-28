@@ -1,9 +1,7 @@
 {* Use the files copied from admin/themes/default/template/include *}
 {* Need: $template->set_template_dir(ICY_PICTURE_MODIFY_PATH.'template/'); *}
 
-{include file="autosize.inc.tpl"}
 {include file="datepicker.inc.tpl"}
-{include file="dbselect.inc.tpl"}
 
 {* Use some default stylesheets *}
 {* The 'datepicker.css' is copied from ./admin/themes/roma/theme.css *}
