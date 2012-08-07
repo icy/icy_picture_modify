@@ -4,7 +4,8 @@
  *          `community`. Advanced ACL support.
  * Author : Piwigo, plg, icy
  * License: GPL2
- * Note   : The source is based on the `picture_modify.php` in Piwigo
+ * Note   : This source is based on `add_photos.php` from the plugin
+ *          `community`.
  */
 
 if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
@@ -151,14 +152,16 @@ SELECT
       $inserts
       );
 
-    // the link on thumbnail must go to the websize photo
-    foreach ($page['thumbnails'] as $idx => $thumbnail)
-    {
-      $page['thumbnails'][$idx]['link'] = str_replace(
-        'thumbnail/'.$conf['prefix_thumbnail'],
-        '',
-        $thumbnail['src']
-        );
+    if (isset($conf['prefix_thumbnail')) {
+      // the link on thumbnail must go to the websize photo
+      foreach ($page['thumbnails'] as $idx => $thumbnail)
+      {
+        $page['thumbnails'][$idx]['link'] = str_replace(
+          'thumbnail/'.$conf['prefix_thumbnail'],
+          '',
+          $thumbnail['src']
+          );
+      }
     }
 
     array_push(
