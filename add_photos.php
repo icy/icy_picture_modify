@@ -152,7 +152,7 @@ SELECT
       $inserts
       );
 
-    if (isset($conf['prefix_thumbnail')) {
+    if (isset($conf['prefix_thumbnail'])) {
       // the link on thumbnail must go to the websize photo
       foreach ($page['thumbnails'] as $idx => $thumbnail)
       {
