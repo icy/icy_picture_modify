@@ -4,8 +4,14 @@
  *          `community`. Advanced ACL support.
  * Author : Piwigo, plg, icy
  * License: GPL2
- * Note   : This source is based on `add_photos.php` from the plugin
- *          `community`.
+ * Note   :
+ *  This source is based on `add_photos.php` from the plugin `community`.
+ *  This script requires `curl_exec` to be supported (see the definition
+ *  of `fetchRemote` in `admin/include/functions.php`) If this method is
+ *  in black-list (by, e.g, suhosin) all images will be uploaded but they
+ *  are put in `pending` mode (that means that the option `moderate_image`
+ *  is always `true`. We may consider to add some option to notify the
+ *  user about this. FIXME: How to know if a method is in black-list?)
  */
 
 if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
