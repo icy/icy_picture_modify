@@ -72,8 +72,8 @@
 
 ## DONATION
 
-  If you know what `donation` is and how it works in Open source develoment,
-  feel free to donate ;) My Paypal email is xkyanh@gmail.com.
+  My paypal account was locked due to their Paypal's stupid policy.
+  I can't receive any kind of donation.
 
 ## AUTHOR
 
