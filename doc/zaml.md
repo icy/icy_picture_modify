@@ -1,3 +1,25 @@
+# TABLE OF CONTENTS
+
+  Major topics in this document
+
+  * Purpose
+  * Format
+  * Changes
+  * Syntax
+    * User specification
+    * Group specification
+    * Variable assigment
+    * Meanless lines (comments)
+  * Important Notes
+  * Parser
+  * Example
+    * Default settings
+    * A normal user
+    * Reference
+    * Group settings
+    * User with multiple groups
+    * Using group as reference
+
 # PURPOSE
 
   This format is used to describe advanced ACL for Piwigo installation.
@@ -24,7 +46,7 @@
   * variable assignment       _(meanful)_
   * all other non-sense lines _(meanless)_
 
-## User name specification
+## User specification
 
   A user name (as in your Piwigo system) is put on a single line,
   ended by a colon (:), and optionally followed by `reference`.
@@ -38,6 +60,15 @@
   * *Note 1:* The special name `default` is used specially by the format,
     and you should not use it for any user in your Piwigo system.
   * *Note 2:* User name must not contain a colon (:)
+
+## Group specification
+
+  As long as your group name doens't have space in its name, you can
+  specify settings for that group in the same way as you do for user.
+  (User is a special group that has only one user; that's why we don't
+  have to bring mess to the syntax.)
+
+  See NOTES for some tips.
 
 ## Variable assignment
 
@@ -66,9 +97,31 @@
 
   In short, there are only two data types: `Boolean` and `Array`.
 
-## Meanless lines
+## Meanless lines (comments)
 
   Any other lines are considered as comment. They are meanless.
+
+# IMPORTANT NOTES
+
+  There are some important notes
+
+  * As 'default' is used as special keywords, you should not have any
+    user / group that has the name 'default' in Piwigo system
+
+  * A group shouldn't use name of any user. This means that if you have
+    any user 'my_user', you should not use 'my_user' as a group name.
+
+  * A group should not contain any space in its name.
+
+  * If a user belongs to one or more groups, they highest permissions
+    from those groups are used. The order of permissions for a user is
+
+      * default settings by the plugin (you can't change these values)
+      * default settings in your configuration (if any)
+      * highest settings from groups (if any)
+      * private settings the user (if any)
+
+    See the EXAMPLES for details.
 
 # PARSER
 
@@ -135,4 +188,50 @@ example_user1:
 ```
 example_user2: @example_user1
   delete_image_of: owner, example_user1
+```
+
+## Groups settings
+
+  'Friends' is a group name in Piwigo administrator management console.
+  Any user in this group can edit their own image, but they can not
+  present their images to any albums.
+
+  'Authors' is another group: user in this group can edit any image,
+  and can upload image to the album 15 and its sub-albums, and they can
+  also present images to those albums.
+
+```
+Friends:
+  edit_image_of: owner
+  present_image_to: no
+
+Authors:
+  edit_image_of: any
+  upload_image_to: sub, 15
+  present_image_to: 15, sub
+```
+
+## User with multiple groups
+
+  If the user 'special_user' belongs to two groups 'Authors' and 'Friends',
+  the highest permissions in these two groups are used. And if there is
+  any private settings for this user, those settings will replace any
+  known groups settings for them.
+
+  Alternatively, this user 'special_user' can be set up by
+
+```
+special_user:
+  edit_image_of: owner, any
+  present_image_to: yes
+  upload_image_to: sub, 15
+```
+
+## Using group as reference
+
+  Even if the user 'example_user3' doesn't belong to group 'Friends',
+  you can use reference to load all settings from that group
+
+```
+example_user3: @Friends
 ```

@@ -37,6 +37,8 @@ SELECT COUNT(id)
  * @return An array, NULL or a Boolean value (See ZAML format)
  * @symbol A variable name in ACL
  * @author icy
+ * @note: ORder of settings
+ *    default < group(s) [merging] < private settings
  */
 function icy_acl_get_value($symbol) {
   global $user, $ICY_ACL;
@@ -44,6 +46,17 @@ function icy_acl_get_value($symbol) {
   // Load ACL setting for this user
   $this_user = $user['username'];
   $my_acl = $ICY_ACL['default'];
+  $user_groups = icy_get_user_groups($user['id']);
+
+  $group_acl = array();
+  foreach ($user_groups as $group) {
+    if (array_key_exists($group, $ICY_ACL)) {
+      $group_acl = icy_acl_get_the_highest_value($group_acl, $ICY_ACL[$group]);
+    }
+  }
+
+  $my_acl = array_replace($my_acl, $group_acl);
+
   if (array_key_exists($this_user, $ICY_ACL)) {
     $my_acl = array_replace($my_acl, $ICY_ACL[$this_user]);
   }
@@ -397,6 +410,7 @@ function icy_zml_parser($data) {
 
     # Other line is ignored :)
   }
+
   return $acl;
 }
 
@@ -445,6 +459,73 @@ function icy_acl_fix_community($force = FALSE) {
   $_SESSION['community_user_id'] = $user['id'];
 
   return TRUE;
+}
+
+/*
+ * Get list of all groups of a user
+ * @user_id: identity of the user
+ * @return : array of group names
+ * @note:
+ *  - FIXME: the output is not cached!!! so it's a bit slow
+ *  - example sql query:
+ *    select name from piwigo_groups
+ *        left join piwigo_user_group as g
+ *      on id = g.group_id and g.user_id = 8;
+ */
+
+function icy_get_user_groups($user_id) {
+  if (!preg_match(PATTERN_ID, $user_id))
+    bad_request('invalid user identifier');
+
+  $groups = array();
+
+  $query = '
+SELECT name
+  FROM '.GROUPS_TABLE.'
+  LEFT JOIN '. USER_GROUP_TABLE. ' as g
+  ON id = g.group_id AND g.user_id = '.$user_id.'
+;';
+
+  $result = pwg_query($query);
+  while ($row = pwg_db_fetch_assoc($result))
+  {
+    array_push($groups, $row['name']);
+  }
+
+  return $groups;
+}
+
+/* Merge two values in ACL. The highest value will win
+ * @input: array of ACL atom
+ * @output: new array of ACL atom
+ * @note: there are only two types in ACL (boolean, array)
+ * @example:
+ *
+ *  $acl = (:do_it => false, :members => array(1,2,3))
+ *  $bcl = (:do_it => true,  :members => any)
+ *
+ *  $acl '+' $bcl => (:do_it => true, :members => array(1,2,3,any))
+ */
+function icy_acl_get_the_highest_value() {
+  $acl = array();
+  $n = func_num_args();
+  while ($n-- > 0) {
+    $bcl = func_get_arg($n);
+    foreach (array_keys($bcl) as $key) {
+      if (array_key_exists($key, $acl)) {
+        if (is_bool($acl[$key])) {
+          $acl[$key] = ($acl[$key] || $acl[$key]);
+        }
+        else {
+          $acl[$key] = array_merge($acl[$key], $bcl[$key]);
+        }
+      }
+      else {
+        $acl[$key] = $bcl[$key];
+      }
+    }
+  }
+  return $acl;
 }
 
 if (!function_exists('array_replace')) {

@@ -1,3 +1,9 @@
+2.1.0 2012-09-09
+
+  - Add group support
+  - New version of ZAML format (See `doc/zaml.md` for details.)
+  - Remove date-picker in edit form to avoid conflicts with some templates
+
 2.0.2 2012-07-11
 
   - Fix various bugs

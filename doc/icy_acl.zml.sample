@@ -42,4 +42,19 @@ example_user1:
 example_user2: @example_user1
   delete_image_of: owner, example_user1
 
-[example_group]:
+# 'Friends' and 'Authors' are groups in Piwigo administrator menu.
+# If a user belongs to these two groups, they can upload images to
+# two albums 56 and 46, and to all children of these two albums.
+
+Friends:
+  edit_image_of: owner
+  members: example_user1, example_user2
+  upload_image_to: sub
+
+Authors:
+  upload_image_to: 56, 46, sub
+
+# Even if the user 'example_user3' doesn't belong to group 'Friends',
+# you can use reference to load all settings from that group
+
+example_user3: @Friends

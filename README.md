@@ -19,6 +19,7 @@
   They can upload some images to some categories.
 
   Advanced ACL allows users to work with any set of images / categories.
+  The newest verion of plugin allows you to work with groups in Piwigo.
 
   This plugin can work on Piwigo 2.2.x, 2.3.x and 2.4.x.
 
