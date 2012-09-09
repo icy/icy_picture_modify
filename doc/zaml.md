@@ -8,8 +8,12 @@
   Format details
 
   * Name:     ZAML (not YAML)
-  * Version:  1.0.0
+  * Version:  1.1.0
   * Author:   icy (Anh K. Huynh)
+
+# Changes
+
+  * 1.0.0 - 1.1.0: add group support
 
 # SYNTAX
 

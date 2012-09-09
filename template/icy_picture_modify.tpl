@@ -1,10 +1,6 @@
 {* Use the files copied from admin/themes/default/template/include *}
 {* Need: $template->set_template_dir(ICY_PICTURE_MODIFY_PATH.'template/'); *}
 
-{include file="datepicker.inc.tpl"}
-
-{combine_css path= 'themes/default/js/ui/theme/'|@cat:'jquery.ui.datepicker.css'}
-{combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'datepicker.css'}
 {combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'icy_picture_modify.css'}
 
 {* Heavily copied from Piwigo distribution: picture_modify.tpl *}

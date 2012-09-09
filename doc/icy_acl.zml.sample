@@ -41,3 +41,5 @@ example_user1:
 
 example_user2: @example_user1
   delete_image_of: owner, example_user1
+
+[example_group]:
