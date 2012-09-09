@@ -3,10 +3,6 @@
 
 {include file="datepicker.inc.tpl"}
 
-{* Use some default stylesheets *}
-{* The 'datepicker.css' is copied from ./admin/themes/roma/theme.css *}
-
-{combine_css path= 'admin/themes/default/'|@cat:'theme.css'}
 {combine_css path= 'themes/default/js/ui/theme/'|@cat:'jquery.ui.datepicker.css'}
 {combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'datepicker.css'}
 {combine_css path= "$ICY_PICTURE_MODIFY_PATH/template/"|@cat:'icy_picture_modify.css'}
@@ -154,7 +150,6 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
                  size="4"
                  maxlength="4"
                  value="{$DATE_CREATION_YEAR_VALUE}">
-          <input id="date_creation_linked_date" name="date_creation_linked_date" type="hidden" size="10" disabled="disabled">
         </td>
       </tr>
 

@@ -1,3 +1,5 @@
+/* Copied from admin/themse/roma/ */
+
 #ui-datepicker-div {background-color: #555; border:2px solid #333;}
 #ui-datepicker-div .ui-datepicker-title {color:white;}
 #ui-datepicker-div .ui-icon-circle-triangle-w {background: transparent url(icon/prev.png) no-repeat;}
