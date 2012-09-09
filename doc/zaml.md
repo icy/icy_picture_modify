@@ -11,7 +11,7 @@
   * Version:  1.1.0
   * Author:   icy (Anh K. Huynh)
 
-# Changes
+# CHANGES
 
   * 1.0.0 - 1.1.0: add group support
 
@@ -63,6 +63,8 @@
     * `sub`:      action can work on sub categories
     * `any`:      action can work on any categories
     * `owner`:    action can work on any image of current user
+
+  In short, there are only two data types: `Boolean` and `Array`.
 
 ## Meanless lines
 
