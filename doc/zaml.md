@@ -3,7 +3,7 @@
   Major topics in this document
 
   * Purpose
-  * Format
+  * Format information
   * Changes
   * Syntax
     * User specification
@@ -25,7 +25,7 @@
   This format is used to describe advanced ACL for Piwigo installation.
   This ACL is supported by the plugin `icy_picture_modify`.
 
-# FORMAT
+# FORMAT INFORMATION
 
   Format details
 
@@ -72,6 +72,8 @@
 
 ## Variable assignment
 
+  There are only two data types in ZAML: `Boolean` and `Array`.
+
   A variable assignment has two parts: a variable name and its value.
   On the line, the variable name must be started by two spaces,
   followed by a colon (:) and its value.
@@ -95,8 +97,6 @@
     * `any`:      action can work on any categories
     * `owner`:    action can work on any image of current user
 
-  In short, there are only two data types: `Boolean` and `Array`.
-
 ## Meanless lines (comments)
 
   Any other lines are considered as comment. They are meanless.
@@ -106,20 +106,18 @@
   There are some important notes
 
   * As 'default' is used as special keywords, you should not have any
-    user / group that has the name 'default' in Piwigo system
-
+    user / group that has the name 'default' in Piwigo system.
   * A group shouldn't use name of any user. This means that if you have
     any user 'my_user', you should not use 'my_user' as a group name.
-
-  * A group should not contain any space in its name.
-
+  * A group should not contain any space in its name. Any restrictions
+    for users are applied to group's name.
   * If a user belongs to one or more groups, they highest permissions
     from those groups are used. The order of permissions for a user is
 
-      * default settings by the plugin (you can't change these values)
-      * default settings in your configuration (if any)
-      * highest settings from groups (if any)
-      * private settings the user (if any)
+      * default settings by the plugin _(you can't change these values)_
+      * default settings in your configuration _(if any)_
+      * highest settings from groups _(if any)_
+      * private settings the user _(if any)_
 
     See the EXAMPLES for details.
 
@@ -139,7 +137,7 @@
   put in the code of the plugin `icy_picture_modify` so you may not have
   to specify them. All of the following lines mean:
 
-  *  User can edit their own images (image they uploaded)
+  *  User can edit their own images _(image they uploaded)_
   *  User can't delete any image
   *  User can upload image to sub categories. Unfortunately, there is no
   *  category specified, so they can't upload images to any category.

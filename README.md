@@ -73,7 +73,7 @@
 
 ## DONATION
 
-  My paypal account was locked due to their Paypal's stupid policy.
+  My paypal account was locked due to Paypal's stupid policy.
   I can't receive any kind of donation.
 
 ## AUTHOR
