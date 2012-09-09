@@ -124,10 +124,14 @@
 # PARSER
 
   Simple parser can be found in the function `icy_zml_parser` in
+
   ```
     plugins/icy_picture_modify/include/ \
       functions_icy_picture_modify.inc.php
   ```
+
+  This simple parse has nothing to do with group settings.
+  See an example in the function `icy_acl_get_value`, though.
 
 # EXAMPLE
 
