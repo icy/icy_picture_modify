@@ -25,13 +25,17 @@
 
 ## USAGE
 
-  * Install and enable this plugin and the plugin `community`.
+  * Install and enable this plugin and the plugin `community`
   * Create and edit ACL file in `local/config/icy_acl.zml` in your Piwigo
-    installation. A sample file can be found in `doc/icy_acl.zml.sample`.
-    You don't have to modify any settings for the plugin `community`.
-    Moverover, any settings of the plugin `community` will be ignored.
+    installation.
+    * A sample file can be found in `doc/icy_acl.zml.sample`
+    * The syntax is described in the document `doc/zaml.md`. Please make
+      sure that you read some important notes in this document.
+    * You don't have to modify any settings for the plugin `community`
+      Moverover, any settings of the plugin `community` will be ignored.
   * If you are using a development version of the plugin, please clean up
     the obsolete files (See `OBSOLETE FILES` below.)
+
 
 ## OBSOLETE FILES
 
@@ -41,7 +45,6 @@
   * `local/config/icy_acl.php`:
     need to be ported to `local/config/icy_acl.zml`. After your old ACL
     settings are ported to new format, you can safely delete this file;
-
   * `_data/icy.log`:
     if you are using `icy_picture_modify` version 2.0.0 or higher, you
     can safely remove this file.
