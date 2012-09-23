@@ -1,3 +1,9 @@
+2.2.0 2012-09-23
+
+  - Change/Clean up style of the edit form
+  - Allow user to update new version of images: New variable in ICY_ACL
+    is `replace_image_of`. See `doc/*` for example and syntax.
+
 2.1.0 2012-09-09
 
   - Add group support
