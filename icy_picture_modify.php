@@ -155,6 +155,9 @@ SELECT category_id
 // |                      replace image by a new one                       |
 // +-----------------------------------------------------------------------+
 
+// NOTE: The following code mainly comes from the main code of the plugin
+// NOTE: `photo_date` (reference file is: plugins/photo_update/admin.php)
+
 if (isset($_FILES['photo_update'])
     and icy_acl("replace_image_of", $_GET['image_id']))
 {
