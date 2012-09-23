@@ -1,3 +1,19 @@
+#icy_picture_modify p {
+  text-align: left;
+}
+
+#icy_picture_modify table td {
+}
+
+#icy_picture_modify table {
+  width: 100%;
+}
+
+#icy_picture_modify textarea {
+  min-width: 400px;
+  min-height: 80px;
+}
+
 /* Copied from admin/themes/default */
 /* TokenInput (with Facebook style) */
 ul.token-input-list {overflow: hidden; height: auto !important; height: 1%;width: 400px;border: 1px solid #8496ba;cursor: text;font-size: 12px;font-family: Verdana;min-height: 1px;z-index: 999;margin: 0;padding: 0;background-color: #fff;list-style-type: none;clear: left;}
