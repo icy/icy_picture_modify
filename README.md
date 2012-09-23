@@ -62,6 +62,7 @@
   * User can delete an image which is associated to some albums to which
     the user doesn't have permission to write/access. This is true as the
     plugin only checks owner of the image.
+  * Images uploaded via Digikam Plugin will be in *pending* mode
 
 ## SUPPORT
 
