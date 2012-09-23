@@ -15,11 +15,13 @@
 ## FEATURES
 
   Normal users in Piwigo system can delete image or modify image's metadata
-  (author, date, tags, description, date, linking/represented categories).
+  _(author, date, tags, description, date, linking/represented categories.)_
   They can upload some images to some categories.
 
   Advanced ACL allows users to work with any set of images / categories.
-  The newest verion of plugin allows you to work with groups in Piwigo.
+  The newest verion of plugin allows you to work with groups in Piwigo,
+  and allow user to update new version of the image _(inspired from the
+  plugin `photo_update`)_
 
   This plugin can work on Piwigo 2.2.x, 2.3.x and 2.4.x.
 
@@ -35,7 +37,6 @@
       Moverover, any settings of the plugin `community` will be ignored.
   * If you are using a development version of the plugin, please clean up
     the obsolete files (See `OBSOLETE FILES` below.)
-
 
 ## OBSOLETE FILES
 
