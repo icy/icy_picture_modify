@@ -104,11 +104,11 @@
 
   * `edit_image_of`:      Default: *owner*.
                           Array of authors whose images are editable by the current user
-  * `delete_image_of`:    Default: *empty array*.
-                          Array of authors whose images are deletable by the current user
   * `replace_image_of`:   Default: *owner*.
                           Array of authors whose images can be replaced by a new version
                             by the current user.
+  * `delete_image_of`:    Default: *empty array*.
+                          Array of authors whose images are deletable by the current user
 
   * `upload_image_to`:    Default: *empty array*.
                           Array of albums to which the current user can upload new image
@@ -118,7 +118,7 @@
                           Array of albums to which the current user can add their image
   * `present_image_to`:   Default: *empty array*.
                           Array of albums for which the current user can make thumbnail
-  * `moderate_image`:     Default: *FALSE*.
+  * `moderate_image`:     Default: *false*.
                           If `true`, new image will be in PENDING mode (that needs
                             review from administrator) after it is uploaded
 
