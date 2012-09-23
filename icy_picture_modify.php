@@ -155,7 +155,8 @@ SELECT category_id
 // |                      replace image by a new one                       |
 // +-----------------------------------------------------------------------+
 
-if (isset($_FILES['photo_update']))
+if (isset($_FILES['photo_update'])
+    and icy_acl("replace_image_of", $_GET['image_id']))
 {
   include_once(PHPWG_ROOT_PATH.'admin/include/functions_upload.inc.php');
 
@@ -426,7 +427,7 @@ $admin_url_start = get_root_url().'index.php?/icy_picture_modify';
 $admin_url_start.= '&amp;image_id='.$_GET['image_id'];
 $admin_url_start.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
 
-if ($page['photo_update_refresh_thumbnail']) {
+if (isset($page['photo_update_refresh_thumbnail']) and $page['photo_update_refresh_thumbnail']) {
   $template->assign('TN_SRC', DerivativeImage::thumb_url($row) . '?' .time());
 } else {
   $template->assign('TN_SRC', get_thumbnail_url($row));
@@ -474,6 +475,10 @@ if (icy_acl("delete_image_of", $_GET['image_id'])) {
   $template->assign(
     'U_DELETE', $admin_url_start.'&amp;delete=1&amp;pwg_token='.get_pwg_token()
   );
+}
+
+if (icy_acl("replace_image_of", $_GET['image_id'])) {
+  $template->assign('U_UPDATE_PHOTO', "YES");
 }
 
 if (array_key_exists('has_high', $row) and $row['has_high'] == 'true')

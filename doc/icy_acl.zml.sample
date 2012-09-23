@@ -11,6 +11,7 @@
 #     any category specified, they can't create any new gallery.
 #   - User can't link an image to any album
 #   - User can't create representation for any album
+#   - User can update new version of their own images
 
 default:
   edit_image_of: owner
@@ -20,6 +21,7 @@ default:
   create_gallery_to: sub
   associate_image_to:
   present_image_to:
+  replace_image_of: owner
 
 # This user can upload image to category whose identity is `34`;
 # He can edit image of his own and of the user `example_user0`;

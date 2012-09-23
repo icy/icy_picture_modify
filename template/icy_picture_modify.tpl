@@ -156,17 +156,19 @@ pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#da
   </fieldset>
 </form>
 
-<form id="photo_update" method="post" action="" enctype="multipart/form-data">
-  <fieldset>
-    <legend>{'Photo Update'|@translate}</legend>
-    <p style="text-align:left; margin-top:0;">
-      <strong>{'Select a file'|@translate}</strong><br>
-      <input type="file" size="60" name="photo_update">
-    </p>
-    <p>
-      <input class="submit" type="submit" value="{'Update'|@translate}" name="photo_update">
-    </p>
-  </fieldset>
-</form>
+{if isset($U_UPDATE_PHOTO)}
+  <form id="photo_update" method="post" action="" enctype="multipart/form-data">
+    <fieldset>
+      <legend>{'Photo Update'|@translate}</legend>
+      <p style="text-align:left; margin-top:0;">
+        <strong>{'Select a file'|@translate}</strong><br>
+        <input type="file" size="60" name="photo_update">
+      </p>
+      <p>
+        <input class="submit" type="submit" value="{'Update'|@translate}" name="photo_update">
+      </p>
+    </fieldset>
+  </form>
+{/if}
 
 </div>

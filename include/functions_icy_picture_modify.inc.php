@@ -342,6 +342,7 @@ default:
   create_gallery_to: sub
   associate_image_to:
   present_image_to: sub
+  replace_image_of: owner
 EOF
 );
 

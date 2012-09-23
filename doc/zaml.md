@@ -9,6 +9,7 @@
     * User specification
     * Group specification
     * Variable assigment
+    * Known variables
     * Meanless lines (comments)
   * Important Notes
   * Parser
@@ -83,7 +84,7 @@
 
   To specify variable's value, you can use
 
-  * nothing, or any spaces      _(meaning: `FALSE`)_
+  * nothing, or any spaces      _(meaning: `FALSE` or `EMPTY ARRAY`)_
   * `no`, `false`               _(meaning: `FALSE`)_
   * `yes`, `true`               _(meaning: `TRUE`)_
   * Any other string. This string will be considered as an array
@@ -96,6 +97,30 @@
     * `sub`:      action can work on sub categories
     * `any`:      action can work on any categories
     * `owner`:    action can work on any image of current user
+
+## Known variables
+
+  The following variables are known
+
+  * `edit_image_of`:      Default: *owner*.
+                          Array of authors whose images are editable by the current user
+  * `delete_image_of`:    Default: *empty array*.
+                          Array of authors whose images are deletable by the current user
+  * `replace_image_of`:   Default: *owner*.
+                          Array of authors whose images can be replaced by a new version
+                            by the current user.
+
+  * `upload_image_to`:    Default: *empty array*.
+                          Array of albums to which the current user can upload new image
+  * `create_gallery_to`:  Default: *empty array*.
+                          Array of albums in which the current user can create new albums
+  * `associate_image_to`: Default: *empty array*.
+                          Array of albums to which the current user can add their image
+  * `present_image_to`:   Default: *empty array*.
+                          Array of albums for which the current user can make thumbnail
+  * `moderate_image`:     Default: *FALSE*.
+                          If `true`, new image will be in PENDING mode (that needs
+                            review from administrator) after it is uploaded
 
 ## Meanless lines (comments)
 
