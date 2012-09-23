@@ -152,6 +152,44 @@ SELECT category_id
 }
 
 // +-----------------------------------------------------------------------+
+// |                      replace image by a new one                       |
+// +-----------------------------------------------------------------------+
+
+if (isset($_FILES['photo_update']))
+{
+  include_once(PHPWG_ROOT_PATH.'admin/include/functions_upload.inc.php');
+
+  if ($_FILES['photo_update']['error'] !== UPLOAD_ERR_OK)
+  {
+    $error_message = file_upload_error_message($_FILES['photo_update']['error']);
+
+    array_push(
+      $page['errors'],
+      $error_message
+      );
+  }
+  else
+  {
+    add_uploaded_file(
+      $_FILES['photo_update']['tmp_name'],
+      $_FILES['photo_update']['name'],
+      null,
+      null,
+      $_GET['image_id']
+      );
+
+    $page['photo_update_refresh_thumbnail'] = true;
+
+    array_push(
+      $page['infos'],
+      l10n('The photo was updated')
+      );
+
+     invalidate_user_cache();
+  }
+}
+
+// +-----------------------------------------------------------------------+
 // |                          synchronize metadata                         |
 // +-----------------------------------------------------------------------+
 
@@ -388,6 +426,12 @@ $admin_url_start = get_root_url().'index.php?/icy_picture_modify';
 $admin_url_start.= '&amp;image_id='.$_GET['image_id'];
 $admin_url_start.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
 
+if ($page['photo_update_refresh_thumbnail']) {
+  $template->assign('TN_SRC', DerivativeImage::thumb_url($row) . '?' .time());
+} else {
+  $template->assign('TN_SRC', get_thumbnail_url($row));
+}
+
 $template->assign(
   array(
     'ICY_PICTURE_MODIFY_PATH' => ICY_PICTURE_MODIFY_PATH,
@@ -396,8 +440,6 @@ $template->assign(
     'tags' => $tags,
 
     'PATH'=>$row['path'],
-
-    'TN_SRC' => get_thumbnail_url($row),
 
     'NAME' =>
       isset($_POST['name']) ?
