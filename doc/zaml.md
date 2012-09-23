@@ -130,10 +130,10 @@
 
   There are some important notes
 
-  * As 'default' is used as special keywords, you should not have any
-    user / group that has the name 'default' in Piwigo system.
+  * As `default` is used as special keywords, you should not have any
+    user / group that has the name `default` in Piwigo system.
   * A group shouldn't use name of any user. This means that if you have
-    any user 'my_user', you should not use 'my_user' as a group name.
+    any user `my_user`, you should not use `my_user` as a group name.
   * A group should not contain any space in its name. Any restrictions
     for users are applied to group's name.
   * If a user belongs to one or more groups, they highest permissions
