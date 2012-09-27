@@ -22,7 +22,9 @@ include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
 include_once(PHPWG_ROOT_PATH.'admin/include/functions_upload.inc.php');
 include_once(COMMUNITY_PATH.'include/functions_community.inc.php');
 
-define('PHOTOS_ADD_BASE_URL', make_index_url(array('section' => 'add_photos')));
+if (!defined('PHOTOS_ADD_BASE_URL')) {
+  define('PHOTOS_ADD_BASE_URL', make_index_url(array('section' => 'add_photos')));
+}
 
 icy_acl_fix_community(icy_acl_load_configuration());
 
