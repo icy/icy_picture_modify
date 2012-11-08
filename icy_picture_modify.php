@@ -423,6 +423,13 @@ $image_file = $row['file'];
 // |                             template init                             |
 // +-----------------------------------------------------------------------+
 
+# Special thanks to Oscar on Piwigo Forum
+# See also http://piwigo.org/forum/viewtopic.php?pid=136917
+# FIXME: Don't use absolute value for height|width. Where to get options?
+if (icy_plugin_enabled("FCKEditor")) {
+  set_fckeditor_instance($areas = 'description', $toolbar = 'Basic', $width = '80%', $height = '200px');
+}
+
 $template->set_template_dir(ICY_PICTURE_MODIFY_PATH.'template/');
 $template->set_filenames(array('icy_picture_modify' => 'icy_picture_modify.tpl'));
 
