@@ -349,14 +349,14 @@ default:
   replace_image_of: owner
   allow_guest: no
 guest:
-  edit_image_of: owner
+  edit_image_of:
   delete_image_of:
-  upload_image_to: sub
+  upload_image_to:
   moderate_image: yes
-  create_gallery_to: sub
+  create_gallery_to:
   associate_image_to:
-  present_image_to: sub
-  replace_image_of: owner
+  present_image_to:
+  replace_image_of:
 EOF
 );
 
