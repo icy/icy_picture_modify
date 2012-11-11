@@ -31,12 +31,13 @@
   Format details
 
   * Name:     ZAML (not YAML)
-  * Version:  1.1.0
+  * Version:  1.1.1
   * Author:   icy (Anh K. Huynh)
 
 # CHANGES
 
-  * 1.0.0 - 1.1.0: add group support
+  * 1.1.1: guest support
+  * 1.1.0: add group support
 
 # SYNTAX
 
@@ -122,9 +123,29 @@
                           If `true`, new image will be in PENDING mode (that needs
                             review from administrator) after it is uploaded
 
+  * `allow_guest`:        Default: *false*.
+                          If `true`, guest user is allowed to edit image.
+                          This value is only fetched from settings for account `default`.
+                          See the section GUEST ACCOUNT for details.
+
 ## Meanless lines (comments)
 
   Any other lines are considered as comment. They are meanless.
+
+# GUEST ACCOUNT
+
+  By default, the guest account isn't allowed to edit picture. To allow
+  them to edit or upload image, you must set `allow_guest` in the settings
+  for the section `default` in the ACL file. This is the only place to do
+  that.
+
+  To increase security, even if the guest support is turned on, all of
+  their settings need to be set up explicitly. This is due to the fact
+  that some default settings for guest account is provided in the source
+  code of the plugin. See example in `doc/` for details.
+
+  Please note you shouldn't put guest account in any group. By doing that
+  your gallery may be altered by any account. Be careful. You've been warned.
 
 # IMPORTANT NOTES
 
@@ -186,6 +207,7 @@ default:
   create_gallery_to: sub
   associate_image_to:
   present_image_to:
+  allow_guest: no
 ```
 
 ## A normal user

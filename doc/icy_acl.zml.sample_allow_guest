@@ -1,0 +1,16 @@
+# Settings for guest account must be set up explicitly
+# This is an example to allow guest to upload images to gallery 10.
+# Newly uploaded imagese will be put in the queue for moderating.
+
+default:
+  allow_guest: yes
+
+guest:
+  edit_image_of: owner
+  delete_image_of:
+  upload_image_to: 10
+  moderate_image: yes
+  create_gallery_to: sub
+  associate_image_to:
+  present_image_to: sub
+  replace_image_of: owner
