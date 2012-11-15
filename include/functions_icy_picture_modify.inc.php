@@ -337,6 +337,7 @@ function icy_acl_load_configuration($force = FALSE) {
     return FALSE;
   }
 
+  # FIXME: We should get Guest UserName from database
   $ICY_ACL = icy_zml_parser(<<<EOF
 default:
   edit_image_of: owner
