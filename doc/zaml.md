@@ -11,6 +11,7 @@
     * Variable assigment
     * Known variables
     * Meanless lines (comments)
+    * Guest account
   * Important Notes
   * Parser
   * Example
@@ -132,7 +133,7 @@
 
   Any other lines are considered as comment. They are meanless.
 
-## GUEST ACCOUNT
+## Guest account
 
   By default, the guest account isn't allowed to edit picture. To allow
   them to edit or upload image, you must set `allow_guest` in the settings
