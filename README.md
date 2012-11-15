@@ -30,7 +30,7 @@
   * Install and enable this plugin and the plugin `community`
   * Create and edit ACL file in `local/config/icy_acl.zml` in your Piwigo
     installation.
-    * A sample file can be found in `doc/icy_acl.zml.sample`
+    * Examples can be found in `doc/*.sample*`
     * The syntax is described in the document `doc/zaml.md`. Please make
       sure that you read some important notes in this document.
     * You don't have to modify any settings for the plugin `community`

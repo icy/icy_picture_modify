@@ -142,7 +142,9 @@
   To increase security, even if the guest support is turned on, all of
   their settings need to be set up explicitly. This is due to the fact
   that some default settings for guest account is provided in the source
-  code of the plugin. See example in `doc/` for details.
+  code of the plugin.
+
+  See some examples in `doc/` for details.
 
   Please note you shouldn't put guest account in any group. By doing that
   your gallery may be altered by any account. Be careful. You've been warned.

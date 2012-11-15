@@ -1,3 +1,8 @@
+2.3.0 2012-11-15
+
+  - Add guest support (Allow guest to edit, upload images). This feature
+    is disabled by default. Example is in `doc/*.sample_allow_guest`
+
 2.2.1 2012-09-23
 
   - Fix version information in the source file (main.inc.php)
