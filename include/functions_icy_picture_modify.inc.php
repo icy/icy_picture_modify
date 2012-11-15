@@ -547,7 +547,7 @@ function icy_acl_guest_allowed() {
   global $ICY_ACL;
 
   if (isset($ICY_ACL['default']) and isset($ICY_ACL['default']['allow_guest'])
-      and $ICY_ACL['default']['allow_guest'])
+      and ($ICY_ACL['default']['allow_guest'] == "true"))
   {
     return TRUE;
   }
