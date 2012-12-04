@@ -1,8 +1,8 @@
-## NAME
+## Name
 
-  `icy_picture_modify` -- Allow user to modify any pictures
+  `icy_picture_modify` -- Piwigo plugin that allows user to modify pictures
 
-## DESCRIPTION
+## Description
 
   A piwigo extension that allows users to edit any set of images.
   This extension just works as the `picture_modify.php` for administrator.
@@ -12,7 +12,7 @@
 
   Advanced ACL is supported since version 1.2.0.
 
-## FEATURES
+## Features
 
   Normal users in Piwigo system can delete image or modify image's metadata
   _(author, date, tags, description, date, linking/represented categories.)_
@@ -25,7 +25,7 @@
 
   This plugin can work on Piwigo 2.2.x, 2.3.x and 2.4.x.
 
-## USAGE
+## Usage
 
   * Install and enable this plugin and the plugin `community`
   * Create and edit ACL file in `local/config/icy_acl.zml` in your Piwigo
@@ -38,7 +38,7 @@
   * If you are using a development version of the plugin, please clean up
     the obsolete files (See `OBSOLETE FILES` below.)
 
-## OBSOLETE FILES
+## Obsolete files
 
   The following files are obsolsete. They need to be ported to new format
   and/or to be removed
@@ -50,7 +50,7 @@
     if you are using `icy_picture_modify` version 2.0.0 or higher, you
     can safely remove this file.
 
-## KNOWN PROBLEMS
+## Known problems
 
   * No webUI for ACL editting
   * If an image is replaced by a new version (using plugin `Photo update`)
@@ -62,26 +62,30 @@
         http://piwigo.org/forum/viewtopic.php?pid=132380#p132380
   * User can delete an image which is associated to some albums to which
     the user doesn't have permission to write/access. This is true as the
-    plugin only checks owner of the image.
+    plugin only checks owner of the image
   * Images uploaded via Digikam Plugin will be in *pending* mode
+  * When user creates new sub-album, their list of visible albums may
+    be expanded and contain all albums on the Piwigo system. This is a
+    problem with session data, and will be fixed immediately after the
+    page is reloaded.
 
-## SUPPORT
+## Support
 
   To get support, please create new issue at
     https://github.com/icy/icy_picture_modify/issues
 
-## DEVELOPMENT
+## Development
 
   The plugin requires a webUI for ACL editting. Unfortunately, the author
   isn't good at template system used by Piwigo. Feel free to help us to
   write a webUI :)
 
-## DONATION
+## Donation
 
   My paypal account was locked due to Paypal's stupid policy.
   I can't receive any kind of donation.
 
-## AUTHOR
+## Author
 
   The author's information
 
@@ -89,7 +93,7 @@
   * Email: kyanh@viettug.org, xkyanh@gmail.com
   * Nickname on Piwigo's forum: icy
 
-## THANKS
+## Thanks
 
   Special thanks to
 
@@ -97,11 +101,11 @@
   * delakut _(Piwigo forum)_
   * IGraham _(Piwigo forum)_
 
-## LICENSE
+## Licnese
 
   GPL2
 
-## HOMGEPAGE
+## Homepage
 
   * At Github.com:  https://github.com/icy/icy_picture_modify
   * At Piwigo.com:   http://piwigo.org/ext/extension_view.php?eid=563
