@@ -69,6 +69,15 @@
     problem with session data, and will be fixed immediately after the
     page is reloaded.
 
+## Security issues
+
+  * The guest account should have the identity *guest*. If you change
+    guest account name, you need to explicitly update setting for this
+    account.
+  * The plugin won't check for user input from `icy_acl.zml`, so you
+    may trick your site by some SQL injection. Yes, if you really want
+    to trick your site.
+
 ## Support
 
   To get support, please create new issue at
