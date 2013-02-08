@@ -145,7 +145,9 @@ function icy_acl_get_real_value($symbol) {
     $symbol_categories = array_merge($symbol_categories, get_subcat_ids($symbol_categories + array(0)));
   }
 
-  $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
+  if (! in_array('hard', $symbol_settings)) {
+    $symbol_categories = array_diff($symbol_categories, $forbidden_categories);
+  }
 
   return array_values($symbol_categories);
 }
@@ -339,6 +341,7 @@ function icy_acl_load_configuration($force = FALSE) {
     return FALSE;
   }
 
+  # FIXME: We should get Guest UserName from database
   $ICY_ACL = icy_zml_parser(<<<EOF
 default:
   edit_image_of: owner
