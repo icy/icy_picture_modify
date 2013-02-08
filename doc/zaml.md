@@ -97,6 +97,7 @@
     * number:     specify category identity
     * user name:  specify any Piwigo user name
     * `sub`:      action can work on sub categories
+    * `hard`:     allow `sub` to acccess forbidden categories
     * `any`:      action can work on any categories
     * `owner`:    action can work on any image of current user
 
