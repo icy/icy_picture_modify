@@ -163,6 +163,8 @@ function icy_acl_get_real_value($symbol) {
  * - others   : boolean flag, $guestdata is not used
  *
  * FIXME: Need to use real values instead !!!
+ * FIXME: When the API is used to upload images, after the user is
+ * FIXME: authenticated, `icy_acl` still detects users as a guest
  */
  function icy_acl($symbol, $guestdata = NULL) {
   global $user, $ICY_ACL, $conf;
