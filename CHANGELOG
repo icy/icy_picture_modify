@@ -1,3 +1,9 @@
+2.3.1 2013-03-16
+
+  - Add a workaround to support Piwigo 2.5. The default template of Piwigo
+    doesn't contain `U_ADMIN` hence we have to add some specific HTML code
+    (to template) from the main code without translation support.
+
 2.3.0 2012-11-15
 
   - Add guest support (Allow guest to edit, upload images). This feature

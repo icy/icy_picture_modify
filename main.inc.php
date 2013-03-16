@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Icy Modify Picture
-Version: 2.3.0
+Version: 2.3.1
 Description: Allow normal users to upload / modify pictures
 Plugin URI: http://piwigo.org/ext/extension_view.php?eid=563
 Author: icy
@@ -92,8 +92,20 @@ function icy_picture_modify_loc_begin_picture()
     {
       $url_admin .= '&amp;cat_id='.$page['category']['id'];
     }
-    $template->assign('U_ADMIN', $url_admin);
+
+    if (version_compare(PHPWG_VERSION, '2.5.0', '<')) {
+      $template->assign('U_ADMIN', $url_admin);
+    }
+    else {
+      // Piwigo 2.5 doesn't support U_ADMIN in the `picture.tpl` and
+      // this just makes this plugin sucks. Using new style? Like this?
+      // What a boring f***cking style I have to find another way
+      // FIXME: + translation here
+      $url_admin = "<a href=\"$url_admin\" title=\"Modify information\" class=\"pwg-state-default pwg-button\" rel=\"nofollow\"> <span class=\"pwg-icon pwg-icon-edit\"> </span><span class=\"pwg-button-text\">Edit</span>";
+      $template->add_picture_button($url_admin, 0);
+    }
   }
+
 }
 
 ?>

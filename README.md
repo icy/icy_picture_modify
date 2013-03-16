@@ -23,7 +23,7 @@
   and allow user to update new version of the image _(inspired from the
   plugin `photo_update`)_
 
-  This plugin can work on Piwigo 2.2.x, 2.3.x and 2.4.x.
+  This plugin can work on Piwigo 2.2.x, 2.3.x, 2.4.x and 2.5.x.
 
 ## Usage
 
@@ -52,6 +52,7 @@
 
 ## Known problems
 
+  * No international support for Piwigo 2.5.x (See CHANGELOG for details)
   * No webUI for ACL editting
   * If an image is replaced by a new version (using plugin `Photo update`)
     the new version is owned by administrator, not the current user.

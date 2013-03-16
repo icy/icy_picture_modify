@@ -438,9 +438,16 @@ $admin_url_start.= '&amp;image_id='.$_GET['image_id'];
 $admin_url_start.= isset($_GET['cat_id']) ? '&amp;cat_id='.$_GET['cat_id'] : '';
 
 if (isset($page['photo_update_refresh_thumbnail']) and $page['photo_update_refresh_thumbnail']) {
-  $template->assign('TN_SRC', DerivativeImage::thumb_url($row) . '?' .time());
+  $thumbnail_signature = "?".time();
 } else {
-  $template->assign('TN_SRC', get_thumbnail_url($row));
+  $thumbnail_signature = "";
+}
+
+if (function_exists('get_thumbnail_url')) {
+  $template->assign('TN_SRC', get_thumbnail_url($row) . $thumbnail_signature);
+} else {
+  // This completely replaces (get_thumbnail_url) since 2.5.0
+  $template->assign('TN_SRC', DerivativeImage::thumb_url($row) . $thumbnail_signature);
 }
 
 $template->assign(
