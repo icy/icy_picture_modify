@@ -10,7 +10,7 @@
   The code of this plugin is based on the original source
   `picture_modify.php` of the Piwigo distribution (version 2.2.3.)
 
-  Advanced ACL is supported since version 1.2.0.
+  Advanced ACL is supported since he version 1.2.0.
 
 ## Features
 
@@ -56,7 +56,9 @@
   * No webUI for ACL editting
   * If an image is replaced by a new version (using plugin `Photo update`)
     the new version is owned by administrator, not the current user.
-    Hence the image may not be editable anymore.
+    Hence the image may not be editable anymore. You should not use that
+    plugin to update image. You can use the setting `replace_image_of`
+    in this plugin's configuration instead.
   * This plugin doesn't support all known templates. If you are using
     `stripped` or `stripped-galleria`, you may follow the instructions
     in this forum post
@@ -93,7 +95,9 @@
 ## Donation
 
   My paypal account was locked due to Paypal's stupid policy.
-  I can't receive any kind of donation.
+  I can't receive any kind of donation. However, you can always rate
+  my plugin at link http://piwigo.org/ext/extension_view.php?eid=563 ,
+  and if possible send a greeting message to me ;)
 
 ## Author
 
