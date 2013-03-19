@@ -115,7 +115,7 @@
   * delakut _(Piwigo forum)_
   * IGraham _(Piwigo forum)_
 
-## Licnese
+## License
 
   GPL2
 
