@@ -27,14 +27,16 @@
 
 ## Installation
 
-  * Install and enable this plugin and the plugin `community` if you want
-    some users to upload images to your gallery.
+  * Install and enable this plugin
+  * Install and enable the plugin `community` if you want some users
+    to upload images to your gallery
     * If the plugin `community` is installed but it isn't activated,
       most functions of the plugin `icy_picture_modify` is still available
       but user won't be able to upload images to gallery
     * You *don't need* to configure any thing in the plugin `community`
       that's because all settings for `community` will be overwritten by
-      `icy_picture_modify`.
+      `icy_picture_modify`. However, the UI of that plugin is still
+      available in case you want to moderate some pending photos.
   * If you have installed the plugin `photo_update` you can disable and/or
     uninstall that plugin because a similar function is supported in
     this plugin `icy_picture_modify`.
