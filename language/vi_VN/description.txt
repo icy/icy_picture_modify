@@ -1,0 +1,1 @@
+Cho phép thành viên tải hình ảnh lên gallery, đổi hoặc chỉnh sửa thông tin của hình trong bất kỳ album nào

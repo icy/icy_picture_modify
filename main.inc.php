@@ -9,12 +9,11 @@ Author URI: http://metakyanh.sarovar.org/
 License: GPL2
 */
 
-if (!defined('PHPWG_ROOT_PATH'))
-{
+if (!defined('PHPWG_ROOT_PATH')) {
   die('Hacking attempt!');
 }
 
-define('ICY_PICTURE_MODIFY_PATH' , PHPWG_PLUGINS_PATH.basename(dirname(__FILE__)).'/');
+define('ICY_PICTURE_MODIFY_PATH' , PHPWG_PLUGINS_PATH .'icy_picture_modify/');
 require_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
 
 # Variable declarations ################################################

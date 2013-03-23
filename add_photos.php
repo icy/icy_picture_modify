@@ -14,12 +14,17 @@
  *  user about this. FIXME: How to know if a method is in black-list?)
  */
 
-if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
+if (!defined('ICY_PICTURE_MODIFY_PATH')) die('Hacking attempt!');
 
 global $template, $conf, $user;
 
 include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
 include_once(PHPWG_ROOT_PATH.'admin/include/functions_upload.inc.php');
+
+if (!icy_plugin_enabled("community")) {
+  die('Something wrong happended. The plugin "community" must be enabled to use this function.');
+}
+
 include_once(COMMUNITY_PATH.'include/functions_community.inc.php');
 
 if (!defined('PHOTOS_ADD_BASE_URL')) {

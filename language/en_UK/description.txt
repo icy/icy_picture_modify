@@ -1,0 +1,1 @@
+Allow normal users to upload images and/or edit information of any set of images. This plugin provides advanced ACL for your gallery.

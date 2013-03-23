@@ -12,6 +12,17 @@ if (!defined('ICY_PICTURE_MODIFY_PATH')) die('Hacking attempt!');
 require_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
 require_once(ICY_PICTURE_MODIFY_PATH.'include/functions_icy_picture_modify.inc.php');
 
+/* Language support */
+load_language('plugin.lang', ICY_PICTURE_MODIFY_PATH . '/');
+
+if (icy_plugin_enabled("photo_update")) {
+  load_language('plugin.lang', PHPWG_PLUGINS_PATH . '/photo_update/');
+}
+
+if (icy_plugin_enabled("community")) {
+  load_language('plugin.lang', PHPWG_PLUGINS_PATH . '/community/');
+}
+
 // <ADMIN_ONLY>
 if (is_admin())
 {
