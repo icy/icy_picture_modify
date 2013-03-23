@@ -25,9 +25,22 @@
 
   This plugin can work on Piwigo 2.2.x, 2.3.x, 2.4.x and 2.5.x.
 
+## Installation
+
+  * Install and enable this plugin and the plugin `community` if you want
+    some users to upload images to your gallery.
+    * If the plugin `community` is installed but it isn't activated,
+      most functions of the plugin `icy_picture_modify` is still available
+      but user won't be able to upload images to gallery
+    * You *don't need* to configure any thing in the plugin `community`
+      that's because all settings for `community` will be overwritten by
+      `icy_picture_modify`.
+  * If you have installed the plugin `photo_update` you can disable and/or
+    uninstall that plugin because a similar function is supported in
+    this plugin `icy_picture_modify`.
+
 ## Usage
 
-  * Install and enable this plugin and the plugin `community`
   * Create and edit ACL file in `local/config/icy_acl.zml` in your Piwigo
     installation.
     * Examples can be found in `doc/*.sample*`
