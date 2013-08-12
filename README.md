@@ -89,12 +89,15 @@
 
 ## Security issues
 
-  * The guest account should have the identity *guest*. If you change
+  * The guest account should have the identity `guest`. If you change
     guest account name, you need to explicitly update setting for this
     account.
   * The plugin won't check for user input from `icy_acl.zml`, so you
     may trick your site by some SQL injection. Yes, if you really want
     to trick your site.
+  * Do use any group name as any username or vice versa. That would make
+    your configuration confused and some settings may have side-effects
+    that are out of your control.
 
 ## Support
 
