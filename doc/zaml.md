@@ -106,12 +106,12 @@
   The following variables are known
 
   * `edit_image_of`:      Default: *owner*.
-                          Array of authors whose images are editable by the current user
+                          Array of authors/groups whose images are editable by the current user
   * `replace_image_of`:   Default: *owner*.
-                          Array of authors whose images can be replaced by a new version
+                          Array of authors/groups whose images can be replaced by a new version
                             by the current user.
   * `delete_image_of`:    Default: *empty array*.
-                          Array of authors whose images are deletable by the current user
+                          Array of authors/groups whose images are deletable by the current user
 
   * `upload_image_to`:    Default: *empty array*.
                           Array of albums to which the current user can upload new image
@@ -249,9 +249,10 @@ example_user2: @example_user1
   Any user in this group can edit their own image, but they can not
   present their images to any albums.
 
-  'Authors' is another group: user in this group can edit any image,
-  and can upload image to the album 15 and its sub-albums, and they can
-  also present images to those albums.
+  'Authors' is another group: user in this group can edit any image of
+  their own, or image of any user belongs to the 'Friends' group; and
+  they can upload image to the album 15 and its sub-albums, and can also
+  present images to those albums.
 
 ```
 Friends:
@@ -259,7 +260,7 @@ Friends:
   present_image_to: no
 
 Authors:
-  edit_image_of: any
+  edit_image_of: Friends, owner
   upload_image_to: sub, 15
   present_image_to: 15, sub
 ```
