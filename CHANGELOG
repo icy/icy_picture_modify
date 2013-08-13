@@ -1,3 +1,10 @@
+2.4.0 2013-08-13
+
+  - Accept group name when specifing values for `_of` variables (they are
+    `edit_image_of`, `replace_image_of`, `delete_image_of`). This is bc.
+    there are no difference between a `group` and a `user` (which is
+    considered as a group that has only one member.)
+
 2.3.1 2013-03-16
 
   - Add a workaround to support Piwigo 2.5. The default template of Piwigo
