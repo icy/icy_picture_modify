@@ -201,10 +201,15 @@ function icy_acl_get_real_value($symbol) {
   }
 
   if (preg_match("/_of$/", $symbol)) {
-    $guestdata = icy_get_username_of(icy_get_user_id_of_image($guestdata));
+    $img_userid = icy_get_user_id_of_image($guestdata);
+    $guestdata = array(icy_get_username_of($img_userid));
+    $guestdata = array_merge($guestdata, icy_get_user_groups($img_userid));
+    $guestdata = array_intersect($guestdata, $symbol_data);
+    return ! empty($guestdata);
   }
-
-  return in_array($guestdata, $symbol_data);
+  else {
+    return in_array($guestdata, $symbol_data);
+  }
 }
 
 function icy_acl_is_value_open($symbol_data) {
