@@ -4,6 +4,10 @@
       https://github.com/icy/icy_picture_modify/ \
         commit/6a8f26e8ebbc2cec477a43791cc46fcc380a7221
 
+    This issue affects any version from 2.1.0 to 2.4.0. Please upgrade
+    to the latest version and/or apply the patch files found in
+      https://github.com/icy/icy_picture_modify/tree/master/patches/
+
 2.4.0 2013-08-13
 
   - Accept group name when specifing values for `_of` variables (they are
