@@ -89,6 +89,11 @@
 
 ## Security issues
 
+  * All versions from 2.1.0 to 2.4.0 have a security issue that may
+    break your ACL settings, and that allows any user in Piwigo system
+    to edit any images in the system. This problem is fixed in the version
+    2.4.1. Please upgrade to this version or apply the patch file
+    `/patches/IPM-SA-2013-08-14.patch` found in the source tree.
   * The guest account should have the identity `guest`. If you change
     guest account name, you need to explicitly update setting for this
     account.
@@ -132,6 +137,7 @@
   * plg     _(Piwigo forum)_
   * delakut _(Piwigo forum)_
   * IGraham _(Piwigo forum)_
+  * Kalle   _(Piwigo forum)_
 
 ## License
 
