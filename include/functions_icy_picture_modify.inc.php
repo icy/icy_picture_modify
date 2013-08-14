@@ -507,7 +507,7 @@ function icy_get_user_groups($user_id) {
   $query = '
 SELECT name
   FROM '.GROUPS_TABLE.'
-  LEFT JOIN '. USER_GROUP_TABLE. ' as g
+  JOIN '. USER_GROUP_TABLE. ' as g
   ON id = g.group_id AND g.user_id = '.$user_id.'
 ;';
 
