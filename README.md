@@ -148,5 +148,6 @@
   * At Github.com:  https://github.com/icy/icy_picture_modify
   * At Piwigo.com:   http://piwigo.org/ext/extension_view.php?eid=563
   * Forum link:      http://piwigo.org/forum/viewtopic.php?id=17745,
-                     http://piwigo.org/forum/viewtopic.php?id=20333
+                     http://piwigo.org/forum/viewtopic.php?id=20333,
+                     http://piwigo.org/forum/viewtopic.php?pid=145328
   * SVN repository:  http://piwigo.org/svn/extensions/Icy_Picture_Modify/ (out-of-date)
