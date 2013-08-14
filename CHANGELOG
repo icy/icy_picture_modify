@@ -1,3 +1,9 @@
+2.4.1 2013-08-14
+
+  - Fix security issue IPM-SA-2013-08-14. Details can be found in
+      https://github.com/icy/icy_picture_modify/ \
+        commit/6a8f26e8ebbc2cec477a43791cc46fcc380a7221
+
 2.4.0 2013-08-13
 
   - Accept group name when specifing values for `_of` variables (they are
