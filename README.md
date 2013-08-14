@@ -137,7 +137,7 @@
   * plg     _(Piwigo forum)_
   * delakut _(Piwigo forum)_
   * IGraham _(Piwigo forum)_
-  * Kalle   _(Piwigo forum)_
+  * Kalle   _(Piwigo forum)_ *IPM-SA-2013-08-13*
 
 ## License
 
