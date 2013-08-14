@@ -1,0 +1,42 @@
+From 6a8f26e8ebbc2cec477a43791cc46fcc380a7221 Mon Sep 17 00:00:00 2001
+From: Ky-Anh Huynh <kyanh@theslinux.org>
+Date: Wed, 14 Aug 2013 23:22:04 +0700
+Subject: [PATCH] Fix a serious bug that breaks ACL. Thanks to Kalle
+
+We use a wrong JOIN command (left join instead of a inner join),
+that brings the highest permissions to a users. If there are some
+groups, the user can always get the permissions from the highest
+group. This is an effect of the use of LEFT-JOIN query.
+
+If you are using version >= 2.1.0 of this plugin, it is highly
+that you upgrade to the latest version. If you don"t want to upgrade,
+you can
+
+* Edit the file manually, by replacing the LEFT JOIN by JOIN.
+  Please search and edit in the file
+   plugins/icy_picture_modify/include/*.php
+* Apply a patch found from the source tree
+   https://github.com/icy/icy_picture_modify/tree/master/patches/
+  (Find your version and patch file "IPM-SA-2013-08-14.patch"
+
+I hate PHP :)
+---
+ include/functions_icy_picture_modify.inc.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/functions_icy_picture_modify.inc.php b/include/functions_icy_picture_modify.inc.php
+index 1d97992..5f6219f 100644
+--- a/include/functions_icy_picture_modify.inc.php
++++ b/include/functions_icy_picture_modify.inc.php
+@@ -507,7 +507,7 @@ function icy_get_user_groups($user_id) {
+   $query = '
+ SELECT name
+   FROM '.GROUPS_TABLE.'
+-  LEFT JOIN '. USER_GROUP_TABLE. ' as g
++  JOIN '. USER_GROUP_TABLE. ' as g
+   ON id = g.group_id AND g.user_id = '.$user_id.'
+ ;';
+ 
+-- 
+1.8.3
+
