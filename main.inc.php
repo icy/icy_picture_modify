@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Icy Modify Picture
-Version: 2.4.1
+Version: 2.4.2
 Description: Allow normal users to upload / modify pictures
 Plugin URI: http://piwigo.org/ext/extension_view.php?eid=563
 Author: icy
@@ -100,7 +100,7 @@ function icy_picture_modify_loc_begin_picture()
       // this just makes this plugin sucks. Using new style? Like this?
       // What a boring f***cking style I have to find another way
       // FIXME: + translation here
-      $url_admin = "<a href=\"$url_admin\" title=\"Modify information\" class=\"pwg-state-default pwg-button\" rel=\"nofollow\"> <span class=\"pwg-icon pwg-icon-edit\"> </span><span class=\"pwg-button-text\">Edit</span>";
+      $url_admin = "<a href=\"$url_admin\" title=\"Modify information\" class=\"pwg-state-default pwg-button\" rel=\"nofollow\"> <span class=\"pwg-icon pwg-icon-edit\"> </span><span class=\"pwg-button-text\">Edit</span></a>";
       $template->add_picture_button($url_admin, 0);
     }
   }
