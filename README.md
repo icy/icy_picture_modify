@@ -139,6 +139,7 @@
   * IGraham _(Piwigo forum)_
   * Kalle   _(Piwigo forum)_ *IPM-SA-2013-08-13*
   * Flop25  _(flop25 at gmail dot com)_
+  * werdnahman _(Piwigo forum)_ *Windows CR/LF bug*
 
 ## License
 
