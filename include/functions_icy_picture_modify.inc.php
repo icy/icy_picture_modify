@@ -407,12 +407,12 @@ function icy_zml_parser($data) {
     # AUTHOR: @REFERENCE
     if (preg_match('/^([^[:space:]:]+):[[:space:]]+@([^[:space:]:]+)$/', $line, $gs)) {
       $ref_author = trim($gs[2]);
-      if (!array_key_exists($ref_author, $acl)) {
-        continue;
-      }
       $author = trim($gs[1]);
       if (! array_key_exists($author, $acl)) {
         $acl[$author] = array();
+      }
+      if (!array_key_exists($ref_author, $acl)) {
+        continue;
       }
       $acl[$author] = array_replace($acl[$ref_author], $acl[$author]);
     }
