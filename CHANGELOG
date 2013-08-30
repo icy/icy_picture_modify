@@ -1,3 +1,9 @@
+2.4.3 2013-08-30
+
+  - 84e96e3: ACL sample: Add an example of invalid reference
+  - 3c90e2f: !bug: Windows CR/LF will break the parser
+  - c4797c9: !bug: invalid reference skips author setting
+
 2.4.2 2013-08-18
 
   - Fix a missing HTML tag (`a`) that is used to display `edit` button.
