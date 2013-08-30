@@ -58,6 +58,11 @@ Authors:
   upload_image_to: 56, 46, sub
   edit_image_of: Friends
 
+# An example of invalid reference (reference doesn't exist)
+# The setting 'edit_image_of: any' *MUST NOT* be used by @Authors
+Someone: @non-existent-people
+  edit_image_of: any
+
 # Even if the user 'example_user3' doesn't belong to group 'Friends',
 # you can use reference to load all settings from that group
 
