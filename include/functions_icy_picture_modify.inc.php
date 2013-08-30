@@ -395,6 +395,7 @@ function icy_zml_parser($data) {
   }
 
   foreach($data as $line) {
+    $line = rtrim($line);
     # AUTHOR:
     if (preg_match('/^([^[:space:]:]+):$/', $line, $gs)) {
       $author = trim($gs[1]);
