@@ -43,12 +43,15 @@ if (icy_plugin_enabled("community")) {
 
 function icy_picture_modify_fix_community_acl()
 {
+  if (is_admin()) return TRUE;
   icy_acl_fix_community(icy_acl_load_configuration());
 }
 
 function icy_picture_modify_section_init()
 {
   global $tokens, $page;
+
+  if (is_admin()) return TRUE;
 
   if ($tokens[0] == 'icy_picture_modify')
   {
@@ -59,6 +62,8 @@ function icy_picture_modify_section_init()
 function icy_picture_modify_index()
 {
   global $page;
+
+  if (is_admin()) return TRUE;
 
   if (! isset($page['section'])) {
     return TRUE;
@@ -77,6 +82,8 @@ function icy_picture_modify_index()
 function icy_picture_modify_loc_begin_picture()
 {
   global $conf, $template, $page, $user;
+
+  if (is_admin()) return TRUE;
 
   icy_acl_load_configuration();
 
