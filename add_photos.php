@@ -67,6 +67,7 @@ if (isset($_GET['processed']))
     if (isset($_SESSION['uploads'][ $_POST['upload_id'] ]))
     {
       delete_elements($_SESSION['uploads'][ $_POST['upload_id'] ], true);
+      icy_action_log("upload_image", '0', "Fail");
     }
     exit();
   }
@@ -100,7 +101,6 @@ if (isset($image_ids) and count($image_ids) > 0)
     {
       $update = $data;
       $update['id'] = $image_id;
-
       array_push($updates, $update);
     }
 
@@ -157,6 +157,7 @@ SELECT
           'state' => 'moderation_pending',
           )
         );
+      icy_action_log("upload_image.pending", $image_id, 'Success', $category_id);
     }
 
     mass_inserts(
@@ -205,6 +206,7 @@ UPDATE '.IMAGES_TABLE.'
             'category' => $category_infos,
             )
           );
+        icy_action_log("upload_image", $matches[2], 'Success', $category_id);
       }
     }
   }

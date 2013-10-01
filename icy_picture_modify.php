@@ -119,8 +119,8 @@ if (isset($_GET['delete'])
   check_pwg_token();
 
   delete_elements(array($_GET['image_id']), true);
-
   invalidate_user_cache();
+  icy_action_log("delete_image", $_GET['image_id']);
 
   // where to redirect the user now?
   //
@@ -177,11 +177,11 @@ if (isset($_FILES['photo_update'])
   if ($_FILES['photo_update']['error'] !== UPLOAD_ERR_OK)
   {
     $error_message = file_upload_error_message($_FILES['photo_update']['error']);
-
     array_push(
       $page['errors'],
       $error_message
       );
+    icy_action_log("replace_image", $_GET['image_id'], "Fail");
   }
   else
   {
@@ -200,7 +200,8 @@ if (isset($_FILES['photo_update'])
       l10n('The photo was updated')
       );
 
-     invalidate_user_cache();
+    invalidate_user_cache();
+    icy_action_log("replace_image", $_GET['image_id']);
   }
 }
 
@@ -300,6 +301,7 @@ if (isset($_POST['submit']) and count($page['errors']) == 0)
   set_tags($tag_ids, $_GET['image_id']);
 
   array_push($page['infos'], l10n('Photo informations updated'));
+  icy_action_log("update_image_information", $_GET['image_id']);
 }
 
 // +-----------------------------------------------------------------------+
@@ -330,6 +332,7 @@ DELETE '.IMAGE_CATEGORY_TABLE.'.*
   if (! empty($_categories) ) {
     associate_images_to_categories(array($_GET['image_id']), $_categories);
     invalidate_user_cache();
+    icy_action_log("associate_image", $_GET['image_id'], "Success", join("-", $_categories));
   }
 }
 
@@ -368,6 +371,7 @@ if (isset($_POST['cat_elected']))
                     'update' => array('representative_picture_id'));
     mass_updates(CATEGORIES_TABLE, $fields, $datas);
     $update_cache = true;
+    icy_action_log("present_image", $_GET['image_id'], "Success", join("-", $_categories));
   }
 
   # And set random thubnail for others
@@ -433,6 +437,7 @@ $image_file = $row['file'];
 // +-----------------------------------------------------------------------+
 // |                             template init                             |
 // +-----------------------------------------------------------------------+
+// NOTE: Don't log (with icy_action_log) anything below this line
 
 # Special thanks to Oscar on Piwigo Forum
 # See also http://piwigo.org/forum/viewtopic.php?pid=136917
