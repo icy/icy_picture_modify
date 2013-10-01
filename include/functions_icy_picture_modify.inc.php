@@ -224,22 +224,38 @@ function icy_acl_is_value_open($symbol_data) {
  *            or to file `<ROOT>/_data/icy.log`
  * @author    icy
  */
-function icy_log($st, $stderr = FALSE) {
+function icy_log($st, $stderr = FALSE, $log_file = "icy.log") {
   if ($stderr === TRUE) {
     $_f_log = "php://stderr";
   }
   else {
-    $_f_log = PHPWG_ROOT_PATH.'_data/icy.log';
+    $_f_log = PHPWG_ROOT_PATH . '/_data/' . $log_file;
   }
+
+  $timestamp = date(DATE_RFC2822);
 
   $_f_handle = fopen($_f_log, 'a');
   if ($_f_handle) {
-    $new_line = "\n";
-    fwrite($_f_handle, "piwigo/icy_picture_modify: $st". $new_line );
+    fwrite($_f_handle, "$timestamp $st\n");
     if ($stderr !== TRUE) {
       fclose($_f_handle);
     }
   }
+}
+
+/*
+ * Write user action into file
+ */
+function icy_action_log($action, $image_id = 0, $status = 'Success', $category_id = '') {
+  global $user;
+  $_username = $user['username'];
+  if ($status == 'Success') {
+    $status = "";
+  }
+  else {
+    $status = ' [FAIL]';
+  }
+  icy_log("$_username, $action$status, image_id = $image_id, category_id = $category_id", FALSE, "icy_action.log");
 }
 
 /*
