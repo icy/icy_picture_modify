@@ -25,6 +25,10 @@
 
   This plugin can work on Piwigo 2.2.x, 2.3.x, 2.4.x and 2.5.x.
 
+  Since version 2.4.4, the plugin can save user's action into log file.
+  By default, the log file is `_data/icy_action.log`. This file can't
+  be changed.
+
 ## Installation
 
   * Install and enable this plugin
@@ -52,18 +56,6 @@
       Moverover, any settings of the plugin `community` will be ignored.
   * If you are using a development version of the plugin, please clean up
     the obsolete files (See `OBSOLETE FILES` below.)
-
-## Obsolete files
-
-  The following files are obsolsete. They need to be ported to new format
-  and/or to be removed
-
-  * `local/config/icy_acl.php`:
-    need to be ported to `local/config/icy_acl.zml`. After your old ACL
-    settings are ported to new format, you can safely delete this file;
-  * `_data/icy.log`:
-    if you are using `icy_picture_modify` version 2.0.0 or higher, you
-    can safely remove this file.
 
 ## Known problems
 
