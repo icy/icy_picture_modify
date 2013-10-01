@@ -1,3 +1,8 @@
+2.4.4 2013-10-01
+
+  - 4981d7f: Simple logging support for some actions
+  - 2aec83a: Add (icy_action_log) to log action output
+
 2.4.3 2013-08-30
 
   - 84e96e3: ACL sample: Add an example of invalid reference
