@@ -23,20 +23,20 @@ global $ICY_ACL;
 # Hooks declarations ###################################################
 
 add_event_handler('loc_end_section_init', 'icy_picture_modify_section_init');
-add_event_handler('loc_end_index', 'icy_picture_modify_index', 40);
+add_event_handler('loc_end_index', 'icy_picture_modify_index', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
 
 add_event_handler('loc_begin_picture', 'icy_picture_modify_loc_begin_picture');
-add_event_handler('init','icy_picture_modify_fix_community_acl', 40);
+add_event_handler('init','icy_picture_modify_fix_community_acl', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
 # add_event_handler('login_success', );
 
-add_event_handler('blockmanager_apply', 'icy_picture_modify_fix_community_acl', 40);
-add_event_handler('ws_invoke_allowed', 'icy_picture_modify_fix_community_acl', 40);
-add_event_handler('ws_add_methods', 'icy_picture_modify_fix_community_acl', 40);
-add_event_handler('sendResponse', 'icy_picture_modify_fix_community_acl', 40);
+add_event_handler('blockmanager_apply', 'icy_picture_modify_fix_community_acl', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
+add_event_handler('ws_invoke_allowed', 'icy_picture_modify_fix_community_acl', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
+add_event_handler('ws_add_methods', 'icy_picture_modify_fix_community_acl', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
+add_event_handler('sendResponse', 'icy_picture_modify_fix_community_acl', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
 
 if (icy_plugin_enabled("community")) {
   remove_event_handler('loc_end_index', 'community_index');
-  add_event_handler('community_ws_categories_getList', 'icy_picture_modify_fix_community_acl', 40);
+  add_event_handler('community_ws_categories_getList', 'icy_picture_modify_fix_community_acl', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
 }
 
 # Hooks definitions ####################################################
