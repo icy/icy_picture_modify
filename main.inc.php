@@ -37,9 +37,18 @@ add_event_handler('sendResponse', 'icy_picture_modify_fix_community_acl', EVENT_
 if (icy_plugin_enabled("community")) {
   remove_event_handler('loc_end_index', 'community_index');
   add_event_handler('community_ws_categories_getList', 'icy_picture_modify_fix_community_acl', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
+  add_event_handler('sendResponse', 'icy_picture_modify_fix_community_25c', EVENT_HANDLER_PRIORITY_NEUTRAL - 10);
 }
 
 # Hooks definitions ####################################################
+
+/*
+  Community 2.5.c (community_sendResponse) hook calls to the function
+  (invalidate_user_cache) which is only available from `admin`
+*/
+function icy_picture_modify_fix_community_25c() {
+  include_once(PHPWG_ROOT_PATH . 'admin/include/functions.php');
+}
 
 function icy_picture_modify_fix_community_acl()
 {
