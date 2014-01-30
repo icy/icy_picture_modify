@@ -10,7 +10,7 @@
   The code of this plugin is based on the original source
   `picture_modify.php` of the Piwigo distribution (version 2.2.3.)
 
-  Advanced ACL is supported since he version 1.2.0.
+  Advanced ACL is supported since the version 1.2.0.
 
 ## Features
 
@@ -20,8 +20,8 @@
 
   Advanced ACL allows users to work with any set of images / categories.
   The newest verion of plugin allows you to work with groups in Piwigo,
-  and allow user to update new version of the image _(inspired from the
-  plugin `photo_update`)_
+  and allows user to update new version of the image _(inspired from the
+  plugin `photo update`.)_
 
   This plugin can work on Piwigo 2.2.x, 2.3.x, 2.4.x and 2.5.x.
 
@@ -119,7 +119,7 @@
   The author's information
 
   * Real name: Anh K. Huỳnh
-  * Email: kyanh@viettug.org, xkyanh@gmail.com
+  * Email: kyanh at theslinux dot org
   * Nickname on Piwigo's forum: icy
 
 ## Thanks
