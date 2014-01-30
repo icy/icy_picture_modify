@@ -33,11 +33,6 @@ jQuery(document).ready(function() {ldelim}
 });
 {/footer_script}
 
-{footer_script}
-pwg_initialization_datepicker("#date_creation_day", "#date_creation_month", "#date_creation_year", "#date_creation_linked_date", "#date_creation_action_set");
-{/footer_script}
-
-
 <h2>{'Edit photo information'|@translate}</h2>
 
 <div id="icy_picture_modify">
