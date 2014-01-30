@@ -1,3 +1,10 @@
+2.4.5 2014-01-30
+
+  - Compatible with Piwigo 2.6.1
+  - 13441c4: js/chosen: Add missing *.png files
+  - 635b4eb: js/datepicker: Remove unused code
+  - 8c46dc0: js/chosen: Fetch latest code from Piwigo 2.6.1
+
 2.4.4 2013-10-01
 
   - 4981d7f: Simple logging support for some actions
