@@ -495,6 +495,8 @@ function icy_acl_fix_community($force = FALSE) {
   $return['create_categories'] = icy_acl_get_real_value("create_gallery_to");
   $return['permission_ids'] = array();
   $return['icy_acl_fixed'] = 1;
+  /* Since Community 2.6 (!?), this setting is required for user */
+  $return['community_enabled'] = 20140201;
 
   $_SESSION['community_user_permissions'] = $return;
   $_SESSION['community_cache_key'] = $cache_key;
