@@ -1,3 +1,7 @@
+2.4.6 2014-02-01
+
+  - cb10d77: !bug: upload func. not work with Community 2.6
+
 2.4.5 2014-01-30
 
   - Compatible with Piwigo 2.6.1
