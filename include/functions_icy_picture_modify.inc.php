@@ -85,11 +85,8 @@ function icy_acl_get_real_value($symbol) {
   $symbol_categories = array();
   $symbol_settings = NULL;
 
-  if ( ! icy_acl_guest_allowed()) {
-    // It's always EMPTY array for any kind of guests
-    if ($user['id'] == $conf['guest_id']) {
-      return array();
-    }
+  if (icy_acl_is_guest_and_disallowed()) {
+    return array();
   }
 
   // check if $symbol is valid. There are two kinds of variable that
@@ -174,10 +171,8 @@ function icy_acl_get_real_value($symbol) {
   // Load ACL setting for this user
   $this_user = $user['id'];
 
-  if (! icy_acl_guest_allowed()) {
-    if ($user['id'] == $conf['guest_id']) {
-      return FALSE;
-    }
+  if (icy_acl_is_guest_and_disallowed()) {
+    return FALSE;
   }
   elseif (is_admin()) {
     return TRUE;
@@ -572,17 +567,21 @@ function icy_acl_get_the_highest_value() {
   return $acl;
 }
 
-function icy_acl_guest_allowed() {
-  global $ICY_ACL;
+function icy_acl_is_guest_and_disallowed() {
+  global $ICY_ACL, $user, $conf;
 
-  if (isset($ICY_ACL['default']) and isset($ICY_ACL['default']['allow_guest'])
-      and ($ICY_ACL['default']['allow_guest'] == "true"))
-  {
-    return TRUE;
+  if ($user['id'] == $conf['guest_id']) {
+    if (isset($ICY_ACL['default'])
+        and isset($ICY_ACL['default']['allow_guest'])
+        and ($ICY_ACL['default']['allow_guest'] == "true"))
+    {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
   }
-  else {
-    return FALSE;
-  }
+  return FALSE;
 }
 
 if (!function_exists('array_replace')) {
