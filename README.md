@@ -1,3 +1,7 @@
+## Important announcement (2014-Feb-25)
+
+  See NEWS for details.
+
 ## Name
 
   `icy_picture_modify` -- Piwigo plugin that allows user to modify pictures

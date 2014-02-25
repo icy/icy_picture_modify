@@ -1,0 +1,30 @@
+News of the day 2014-Feb-25
+===========================
+
+Originally posted on Piwigo forum
+  http://piwigo.org/forum/viewtopic.php?pid=150124
+
+Hello,
+
+This is not a good new for the users of my pllugins.
+In short, I don't have much time to work on this plugin,
+so I decide to give it up, and I am looking for someone to help.
+
+I still work to have bug fixes and security fixes for the latest version
+2.4.6 of the plugin, but I will not give any new feature. If you're an
+user of my plugin, please take a look at an alternative (if any),
+and accept my apologies.
+
+If you're a developer and you're interested in my plugin, please help
+to maintain it. I can share all my knowledge. The source code of the
+plugin is at https://github.com/icy/icy_picture_modify (this is the
+official repository; there is a out-of-date sub-tree in Piwigo
+SVN repository; pls don't use it.)
+
+I'm very sorry for my leaving. I'd like to thank you all for using
+and supporting my plugin during the last years.
+
+Regards,
+
+--
+Anh K. Huynh (aka "icy" on Piwigo forum)
