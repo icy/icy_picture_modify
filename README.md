@@ -1,6 +1,6 @@
 ## Important announcement (2014-Feb-25)
 
-  See NEWS for details.
+  See CONTRIBUTING for details.
 
 ## Name
 
